@@ -98,11 +98,6 @@ int StackResize(Stack_t* stk, bool resizeflag)
 int StackPush(Stack_t* stk, StackElem_t element)
 {
 
-    if(element == NULL)
-    {
-        printf("Elemment of stack must be StakElem_t type!\n");
-        return INPUT_ERROR;
-    }
 
     STACK_ASSERT(stk);
 
