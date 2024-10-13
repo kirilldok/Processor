@@ -1,24 +1,13 @@
 #include<stdio.h>
 #include<stdbool.h>
-#include <string.h>
-#include "StackFunc.h"
+#include<string.h>
 
-enum Machine_Commands
-{
-    PUSH = 1,
-    OUT  = 10,
-    ADD  = 11,
-    SUB  = 100,
-    MUL  = 101,
-    DIV  = 110,
-    DUMP = 111,
-
-    HLT  = 0,
-};
+#include"StackFunc.h"
+#include"Processor.h"
 
 
-void RunCode(int code[]);
-int Read_Prog_File(FILE* Input_code, int code[]);
+void RunCode(SPU_t* spu);
+int Read_Prog_File(FILE* Input_code, SPU_t* spu);
 
 int main(int argc, char* argv[])
 {
@@ -27,21 +16,22 @@ int main(int argc, char* argv[])
     fclose(clean);
     #endif
 
-    int code[128] = { 0 };
+    SPU_t spu = { 0 };
+
 
     if (argc > 2)
     {
         FILE* input_file = fopen(argv[1], "r");
-        Read_Prog_File(input_file, code);
-        RunCode(code);
+        Read_Prog_File(input_file, &spu);
+        RunCode(&spu);
         //fclose(input_file);
     }
     else
     {
         FILE* default_file = fopen("Machine_code.txt", "r");
         fprintf(stderr, "No intput files. Default file Machine_code.txt opened.\n");
-        Read_Prog_File(default_file, code);
-        RunCode(code);
+        Read_Prog_File(default_file, &spu);
+        RunCode(&spu);
         //fclose(default_file);
     }
 
@@ -49,23 +39,23 @@ int main(int argc, char* argv[])
 }
 
 
-void RunCode(int code[])
+void RunCode(SPU_t* spu)//TODO struct stk->code[]
 {
 
     Stack_t stk = {};
     StackCtor(&stk, 32);
+    spu->ip = 0;
 
     bool Loop_flag = 1;
-    int ip = 0;
 
     while(Loop_flag)
     {
-        switch(code[ip])
+        switch(spu->code[spu->ip])
         {
             case PUSH:
             {
-                StackPush(&stk, code[++ip]);
-                ++ip;
+                StackPush(&stk, spu->code[++(spu->ip)]);
+                ++spu->ip;
                 break;
             }
 
@@ -78,7 +68,7 @@ void RunCode(int code[])
 
                 StackPush(&stk, arg_2  - arg_1);
 
-                ++ip;
+                ++spu->ip;
                 break;
             }
 
@@ -91,7 +81,7 @@ void RunCode(int code[])
 
                 StackPush(&stk, arg_2 + arg_1);
 
-                ++ip;
+                ++spu->ip;
                 break;
             }
 
@@ -104,7 +94,7 @@ void RunCode(int code[])
 
                 StackPush(&stk, arg_2 / arg_1);
 
-                ++ip;
+                ++spu->ip;
                 break;
             }
 
@@ -117,7 +107,7 @@ void RunCode(int code[])
 
                 StackPush(&stk, arg_1 * arg_2);
 
-                ++ip;
+                ++spu->ip;
                 break;
             }
 
@@ -127,7 +117,7 @@ void RunCode(int code[])
                 StackPop(&stk, &arg);
                 fprintf(stderr, "Output element = '%d' \n", arg);
 
-                ++ip;
+                ++spu->ip;
                 break;
             }
 
@@ -135,7 +125,7 @@ void RunCode(int code[])
             {
                 Stack_Dump(&stk);
 
-                ++ip;
+                ++spu->ip;
                 break;
             }
 
@@ -151,8 +141,8 @@ void RunCode(int code[])
             default:
             {
                 StackDtor(&stk);
-                fprintf(stderr, "Sintax Error: '%d'\n", code[ip]);
-                //fclose(Prog_code);
+                fprintf(stderr, "Sintax Error: '%d'\n", spu->code[spu->ip]);
+                // fclose(Prog_code);
                 Loop_flag = 0;
             }
 
@@ -161,13 +151,21 @@ void RunCode(int code[])
 
 }
 
- 
-int Read_Prog_File(FILE* Input_code, int code[])
+
+int Read_Prog_File(FILE* Input_code, SPU_t* spu)
 {
-    int ip = 0;
+    fseek(Input_code, 13L , SEEK_SET);
+    fscanf(Input_code, "%lu", &spu->code_size);
+    //fprintf(stderr, "size = %lu\n", spu->code_size);
 
-    while((fscanf(Input_code, " %d", &code[ip++])) && (code[ip-1] != 0));
+    for(spu->ip = 0; spu->ip < spu->code_size; spu->ip++)
+    {
+        fscanf(Input_code, " %d", &spu->code[spu->ip]);
+        //fprintf(stderr, " %d\n", spu->code[spu->ip]);
+    }
 
+    //while((fscanf(Input_code, " %d", &code[ip++])) && (code[ip-1] != 0));
+    spu->ip = 0;
     fclose(Input_code);
 
     return 1;

@@ -1,5 +1,5 @@
 ########################## STACK INFO ##########################
-## CALLER STACK: 0x7ffc33cc8b70
+## CALLER STACK: 0x76f43af0b0b0
 ## CALLER FILE    : StackFunc.cpp
 ## CALLER FUNCTION: StackCtor
 ## LINE          = 48
@@ -7,7 +7,7 @@
 ## STACK CAPACIY = 32
 ## LEFT STACK CANARY = 12000
 ## RIGHT STACK CANARY = 12100
-## STACK DATA PTR: 0x60d000000040
+## STACK DATA PTR: 0x50d000000040
 ## DATA BUFFER: 
 ### LEFT CANARY: 13000
 # [-6666]  (1)

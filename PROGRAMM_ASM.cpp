@@ -1,52 +1,42 @@
 #include<stdio.h>
 #include<stdbool.h>
-#include <string.h>
+#include<string.h>
+
 #include "StackFunc.h"
+#include "Processor.h"
 
-enum Machine_Commands
-{
-    PUSH = 1,
-    OUT  = 10,
-    ADD  = 11,
-    SUB  = 100,
-    MUL  = 101,
-    DIV  = 110,
-    DUMP = 111,
 
-    HLT  = 0,
-};
-
-int ConvertCode(FILE* Input_code, FILE* Output_code);
+int Convert_Code_To_Array(FILE* Input_code, SPU_t* code);
+int Write_in_file(FILE* Output_code, SPU_t* spu);
 
 int main(int argc, const char* argv[])
 {
-    FILE* Machine_code = fopen("Machine_code.txt", "w+");
-    int size_of_code = 0;
+    SPU_t spu = { 0 };
 
     if (argc > 2)
     {
         FILE* CODE_ASM = fopen( argv[1], "r");
-        size_of_code = ConvertCode(CODE_ASM, Machine_code);
+        Convert_Code_To_Array(CODE_ASM, &spu);
     }
     else
     {
         FILE* default_f = fopen("default_programm_code.txt", "r");
         fprintf(stderr, "No intput files. Default file opened.\n");
-        size_of_code = ConvertCode(default_f,  Machine_code);
+        Convert_Code_To_Array(default_f, &spu);
     }
 
-    printf("size of code = %d\n", size_of_code);
+    FILE* Machine_code = fopen("Machine_code.txt", "w+");
+    Write_in_file(Machine_code, &spu);
 
-
+    return 0;
 }
 
 
 
-int  ConvertCode(FILE* Input_code,  FILE* Output_code)
+int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
 {
-    int size_of_code;
+    size_t size_of_code = 0;
     bool Loop_flag = 1;
-
 
     while(Loop_flag)
     {
@@ -54,62 +44,86 @@ int  ConvertCode(FILE* Input_code,  FILE* Output_code)
         fscanf(Input_code, "%s", command);
         if (strcmp(command, "push") == 0)
         {
+            spu->code[size_of_code] = PUSH;
+            size_of_code++;
+
             int arg = 0;
             fscanf(Input_code, "%d", &arg);
-            fprintf(Output_code, "%d %d\n", PUSH, arg);
-            size_of_code += 2;
+            spu->code[size_of_code] = arg;
+            size_of_code++;
         }
 
         else if (strcmp(command, "sub") == 0)
         {
-            fprintf(Output_code, "%d\n", SUB);
+            spu->code[size_of_code] = SUB;
             size_of_code++;
         }
 
         else if(strcmp(command, "add") == 0)
         {
-            fprintf(Output_code, "%d\n", ADD);
+            spu->code[size_of_code] = ADD;
             size_of_code++;
         }
 
         else if(strcmp(command, "div") == 0)
         {
-            fprintf(Output_code, "%d\n", DIV);
+            spu->code[size_of_code] = DIV;
             size_of_code++;
         }
 
         else if(strcmp(command, "mul") == 0)
         {
-            fprintf(Output_code, "%d\n", MUL);
+            spu->code[size_of_code] = MUL;
             size_of_code++;
         }
 
         else if(strcmp(command, "out") == 0)
         {
-            fprintf(Output_code, "%d\n", OUT);
+            spu->code[size_of_code] = OUT;
             size_of_code++;
         }
 
         else if(strcmp(command, "dump") == 0)
         {
-            fprintf(Output_code, "%d\n", DUMP);
+            spu->code[size_of_code] = DUMP;
+            size_of_code++;
+        }
+
+        else if(strcmp(command, "jmp") == 0)
+        {
+            spu->code[size_of_code] = JMP;
+            size_of_code++;
+
+            int arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
+            size_of_code++;
+        }
+
+        else if(strcmp(command, "ja") == 0)
+        {
+            spu->code[size_of_code] = JA;
+            size_of_code++;
+
+            int arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
             size_of_code++;
         }
 
         else if(strcmp(command, "hlt") == 0)
         {
-            fprintf(Output_code, "%d\n", HLT);
+            spu->code[size_of_code] = HLT;
             size_of_code++;
-            fclose(Output_code);
             fclose(Input_code);
+            spu->code_size = size_of_code;
             Loop_flag = 0;
 
-            return size_of_code;
+            return 1;
         }
 
         else
         {
-            fclose(Output_code);
             fclose(Input_code);
             fprintf(stderr, "Sintax Error: '%s'\n", command);
             Loop_flag = 0;
@@ -118,5 +132,50 @@ int  ConvertCode(FILE* Input_code,  FILE* Output_code)
         }
     }
 
+    return 0;
+}
+
+
+
+
+int Write_in_file(FILE* Output_code, SPU_t* spu)
+{
+    fprintf(Output_code, "955181419\n");
+    fprintf(Output_code, "2.0\n");
+    fprintf(Output_code, "%lu\n", spu->code_size);
+
+    for(size_t i = 0; i < spu->code_size; i++)
+    {
+        fprintf(Output_code, "%d", spu->code[i]);
+        switch(spu->code[i])
+        {
+            case PUSH:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            case JMP:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            case JA:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            default:
+                fprintf(Output_code, "\n");
+        }
+    }
+
+    fclose(Output_code);
+    fprintf(stderr, "code has been written to file\n");
     return 0;
 }
