@@ -6,4 +6,5 @@ push 60
 sub
 div
 out
+jmp 0
 hlt

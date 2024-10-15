@@ -61,9 +61,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
 
             case SUB:
             {
-                int arg_1 = 0;
+                Code_t arg_1 = 0;
                 StackPop(&stk, &arg_1);
-                int arg_2 = 0;
+                Code_t arg_2 = 0;
                 StackPop(&stk, &arg_2);
 
                 StackPush(&stk, arg_2  - arg_1);
@@ -74,9 +74,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
 
             case ADD:
             {
-                int arg_1 = 0;
+                Code_t arg_1 = 0;
                 StackPop(&stk, &arg_1);
-                int arg_2 = 0;
+                Code_t arg_2 = 0;
                 StackPop(&stk, &arg_2);
 
                 StackPush(&stk, arg_2 + arg_1);
@@ -87,9 +87,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
 
             case DIV:
             {
-                int arg_1 = 0;
+                Code_t arg_1 = 0;
                 StackPop(&stk, &arg_1);
-                int arg_2 = 0;
+                Code_t arg_2 = 0;
                 StackPop(&stk, &arg_2);
 
                 StackPush(&stk, arg_2 / arg_1);
@@ -100,9 +100,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
 
             case MUL:
             {
-                int arg_1 = 0;
+                Code_t arg_1 = 0;
                 StackPop(&stk, &arg_1);
-                int arg_2 = 0;
+                Code_t arg_2 = 0;
                 StackPop(&stk, &arg_2);
 
                 StackPush(&stk, arg_1 * arg_2);
@@ -113,7 +113,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
 
             case OUT:
             {
-                int arg = 0;
+                Code_t arg = 0;
                 StackPop(&stk, &arg);
                 fprintf(stderr, "Output element = '%d' \n", arg);
 
@@ -126,6 +126,103 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
                 Stack_Dump(&stk);
 
                 ++spu->ip;
+                break;
+            }
+
+            case JMP:
+            {
+                spu->ip = (size_t)spu->code[spu->ip + 1];
+
+                break;
+            }
+
+            case JA:
+            {
+                Code_t arg_1 = 0;
+                StackPop(&stk, &arg_1);
+                Code_t arg_2 = 0;
+                StackPop(&stk, &arg_2);
+
+                if(arg_1 > arg_2)
+                {
+                    spu->ip = (size_t)spu->code[spu->ip + 1];
+                }
+
+                break;
+            }
+
+            case JAE:
+            {
+                Code_t arg_1 = 0;
+                StackPop(&stk, &arg_1);
+                Code_t arg_2 = 0;
+                StackPop(&stk, &arg_2);
+
+                if(arg_1 >= arg_2)
+                {
+                    spu->ip = (size_t)spu->code[spu->ip + 1];
+                }
+
+                break;
+            }
+
+            case JB:
+            {
+                Code_t arg_1 = 0;
+                StackPop(&stk, &arg_1);
+                Code_t arg_2 = 0;
+                StackPop(&stk, &arg_2);
+
+                if(arg_1 < arg_2)
+                {
+                    spu->ip = (size_t)spu->code[spu->ip + 1];
+                }
+
+                break;
+            }
+
+            case JBE:
+            {
+                Code_t arg_1 = 0;
+                StackPop(&stk, &arg_1);
+                Code_t arg_2 = 0;
+                StackPop(&stk, &arg_2);
+
+                if(arg_1 <= arg_2)
+                {
+                    spu->ip = (size_t)spu->code[spu->ip + 1];
+                }
+
+                break;
+            }
+
+            case JE:
+            {
+                Code_t arg_1 = 0;
+                StackPop(&stk, &arg_1);
+                Code_t arg_2 = 0;
+                StackPop(&stk, &arg_2);
+
+                if(arg_1 == arg_2)
+                {
+                    spu->ip = (size_t)spu->code[spu->ip + 1];
+                }
+
+                break;
+            }
+
+            case JNE:
+            {
+                Code_t arg_1 = 0;
+                StackPop(&stk, &arg_1);
+                Code_t arg_2 = 0;
+                StackPop(&stk, &arg_2);
+
+                if(arg_1 != arg_2)
+                {
+                    spu->ip = (size_t)spu->code[spu->ip + 1];
+                }
+
                 break;
             }
 

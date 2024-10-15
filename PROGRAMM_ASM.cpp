@@ -47,7 +47,7 @@ int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
             spu->code[size_of_code] = PUSH;
             size_of_code++;
 
-            int arg = 0;
+            Code_t arg = 0;
             fscanf(Input_code, "%d", &arg);
             spu->code[size_of_code] = arg;
             size_of_code++;
@@ -105,7 +105,62 @@ int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
             spu->code[size_of_code] = JA;
             size_of_code++;
 
-            int arg = 0;
+            Code_t arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
+            size_of_code++;
+        }
+
+        else if(strcmp(command, "jae") == 0)
+        {
+            spu->code[size_of_code] = JAE;
+            size_of_code++;
+
+            Code_t arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
+            size_of_code++;
+        }
+
+        else if(strcmp(command, "jb") == 0)
+        {
+            spu->code[size_of_code] = JB;
+            size_of_code++;
+
+            Code_t arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
+            size_of_code++;
+        }
+
+        else if(strcmp(command, "jbe") == 0)
+        {
+            spu->code[size_of_code] = JBE;
+            size_of_code++;
+
+            Code_t arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
+            size_of_code++;
+        }
+
+        else if(strcmp(command, "je") == 0)
+        {
+            spu->code[size_of_code] = JE;
+            size_of_code++;
+
+            Code_t arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
+            size_of_code++;
+        }
+
+        else if(strcmp(command, "jne") == 0)
+        {
+            spu->code[size_of_code] = JNE;
+            size_of_code++;
+
+            Code_t arg = 0;
             fscanf(Input_code, "%d", &arg);
             spu->code[size_of_code] = arg;
             size_of_code++;
@@ -164,6 +219,41 @@ int Write_in_file(FILE* Output_code, SPU_t* spu)
             }
 
             case JA:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            case JAE:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            case JB:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            case JBE:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            case JE:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            case JNE:
             {
                 i++;
                 fprintf(Output_code, " %d\n", spu->code[i]);
