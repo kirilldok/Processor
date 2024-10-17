@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include<stdbool.h>
 #include<string.h>
 
@@ -8,6 +9,7 @@
 
 int Convert_Code_To_Array(FILE* Input_code, SPU_t* code);
 int Write_in_file(FILE* Output_code, SPU_t* spu);
+int Register_convert(char str[]);
 
 int main(int argc, const char* argv[])
 {
@@ -170,12 +172,14 @@ int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
 
         else if(strcmp(command, "pop") == 0)
         {
-            spu->code[size_of_code] = PUSHR;
+            spu->code[size_of_code] = POP;
             size_of_code++;
 
-            int arg = 0;
-            fscanf(Input_code, "%d", &arg);
-            spu->code[size_of_code] = arg;
+            char arg[16] = " ";
+            fscanf(Input_code, "%s", arg);
+            int reg = Register_convert(arg);
+
+            spu->code[size_of_code] = reg;
             size_of_code++;
         }
 
@@ -184,9 +188,11 @@ int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
             spu->code[size_of_code] = PUSHR;
             size_of_code++;
 
-            int arg = 0;
-            fscanf(Input_code, "%d", &arg);
-            spu->code[size_of_code] = arg;
+            char arg[16] = " ";
+            fscanf(Input_code, "%s", arg);
+            int reg = Register_convert(arg);
+
+            spu->code[size_of_code] = reg;
             size_of_code++;
         }
 
@@ -308,4 +314,30 @@ int Write_in_file(FILE* Output_code, SPU_t* spu)
     fclose(Output_code);
     fprintf(stderr, "code has been written to file\n");
     return 0;
+}
+
+
+
+int Register_convert(char str[])
+{
+    if (strcmp(str, "ax") == 0)
+        return AX;
+
+    else if (strcmp(str, "bx") == 0)
+        return BX;
+
+    else if (strcmp(str, "cx") == 0)
+        return CX;
+
+    else if (strcmp(str, "dx") == 0)
+        return DX;
+
+    else if (strcmp(str, "mlr") == 0)
+        return MLR;
+
+    else
+    {
+        fprintf(stderr,"Error in register sintax\n");
+        return 0;
+    }
 }

@@ -114,6 +114,7 @@ int StackDump_t(Stack_t* stk, const char* stkName, const char* file, const char*
         return FILE_CREATION_ERROR;
     }
 
+
     fprintf(log,
     "########################## STACK INFO ##########################\n"
     "## CALLER STACK: %p\n"

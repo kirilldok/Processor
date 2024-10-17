@@ -232,7 +232,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
                 Code_t arg = 0;
                 StackPop(&stk, &arg);
 
-                spu->register[spu->code[++(spu->ip)]] = arg;
+                spu->registers[spu->code[++(spu->ip)]] = arg;
                 ++spu->ip;
                 break;
             }
@@ -276,11 +276,13 @@ int Read_Prog_File(FILE* Input_code, SPU_t* spu)
     for(spu->ip = 0; spu->ip < spu->code_size; spu->ip++)
     {
         fscanf(Input_code, " %d", &spu->code[spu->ip]);
-        //fprintf(stderr, " %d\n", spu->code[spu->ip]);
+        fprintf(stderr, " %d\n", spu->code[spu->ip]);
     }
 
     //while((fscanf(Input_code, " %d", &code[ip++])) && (code[ip-1] != 0));
     spu->ip = 0;
+    
+    SpuDump(spu);
     fclose(Input_code);
 
     return 1;

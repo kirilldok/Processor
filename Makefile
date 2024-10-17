@@ -15,7 +15,7 @@ LDFLAGS := -pie -fPIE $(SANITIZEFLAGS)
 Objects/%.o : %.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -c -o $@
 
-SOURCES :=  Objects/StackFunc.o Objects/Stackdebug.o Objects/hash.o
+SOURCES :=  Objects/StackFunc.o Objects/Stackdebug.o Objects/hash.o Objects/Processor.o
 
 main: Objects/main.o $(SOURCES)
 	$(CXX) Objects/main.o $(SOURCES) $(LDFLAGS) -o main

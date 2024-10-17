@@ -9,10 +9,11 @@
 
 enum registers
 {
-    AX = 1,
-    BX = 2,
-    CX = 3,
-    DX = 4,
+    AX  = 1,
+    BX  = 2,
+    CX  = 3,
+    DX  = 4,
+    MLR = 5,
 };
 
 enum Machine_Commands
@@ -34,8 +35,9 @@ enum Machine_Commands
     JNE   = 14,
 
     PUSHR = 15,
+    POP   = 16,
 
-    HLT  = 0,
+    HLT   = 0,
 };
 
 typedef int Code_t;
@@ -48,8 +50,14 @@ typedef struct SPU_t
 
     Stack_t stk;
 
-    int registers[16];
-
+    int registers[16] ;
 } SPU_t;
+
+
+int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line);
+
+#ifndef SPU_DUMP_INC
+#define SpuDump(spu) SPUDump_t((spu),  __FILE__, __func__, __LINE__)
+#endif
 
 #endif

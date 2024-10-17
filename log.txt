@@ -1,5 +1,5 @@
 ########################## STACK INFO ##########################
-## CALLER STACK: 0x77a70a30b170
+## CALLER STACK: 0x7e60bbf0b190
 ## CALLER FILE    : StackFunc.cpp
 ## CALLER FUNCTION: StackCtor
 ## LINE          = 48
@@ -45,6 +45,26 @@
 ### RIGHT CANARY: 13100
 ## HASH SUM: 2950326611946442783
 ## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x7e60bbf0b190
+## CALLER FILE    : Stackdebug.cpp
+## CALLER FUNCTION: StackAssert
+## LINE          = 28
+## STACK SIZE    = 18446744073709551615
+## STACK CAPACIY = 1
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000030
+## DATA BUFFER: 
+### LEFT CANARY: -6666
+# [-6666]  (1)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744073516165609
+## ERRORS: 0001011111111110
 ################################################################
 
 
