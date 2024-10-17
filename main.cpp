@@ -129,6 +129,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
                 break;
             }
 
+
             case JMP:
             {
                 spu->ip = (size_t)spu->code[spu->ip + 1];
@@ -223,6 +224,23 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
                     spu->ip = (size_t)spu->code[spu->ip + 1];
                 }
 
+                break;
+            }
+
+            case POP:
+            {
+                Code_t arg = 0;
+                StackPop(&stk, &arg);
+
+                spu->register[spu->code[++(spu->ip)]] = arg;
+                ++spu->ip;
+                break;
+            }
+
+            case PUSHR:
+            {
+                StackPush(&stk, spu->registers[spu->code[++(spu->ip)]]);
+                ++spu->ip;
                 break;
             }
 

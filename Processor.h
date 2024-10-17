@@ -7,22 +7,33 @@
 #include<math.h>
 #include"StackFunc.h"
 
+enum registers
+{
+    AX = 1,
+    BX = 2,
+    CX = 3,
+    DX = 4,
+};
+
 enum Machine_Commands
 {
-    PUSH = 1,
-    OUT  = 10,
-    ADD  = 11,
-    SUB  = 100,
-    MUL  = 101,
-    DIV  = 110,
-    DUMP = 111,
-    JMP  = 1000,
-    JA   = 1001,
-    JAE  = 1010,
-    JB   = 1011,
-    JBE  = 1100,
-    JE   = 1101,
-    JNE  = 1110,
+    PUSH  = 1,
+    OUT   = 2,
+    ADD   = 3,
+    SUB   = 4,
+    MUL   = 5,
+    DIV   = 6,
+    DUMP  = 7,
+
+    JMP   = 8,
+    JA    = 9,
+    JAE   = 10,
+    JB    = 11,
+    JBE   = 12,
+    JE    = 13,
+    JNE   = 14,
+
+    PUSHR = 15,
 
     HLT  = 0,
 };
@@ -37,7 +48,7 @@ typedef struct SPU_t
 
     Stack_t stk;
 
-    int* registers;
+    int registers[16];
 
 } SPU_t;
 

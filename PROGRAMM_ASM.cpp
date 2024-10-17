@@ -89,6 +89,7 @@ int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
             size_of_code++;
         }
 
+
         else if(strcmp(command, "jmp") == 0)
         {
             spu->code[size_of_code] = JMP;
@@ -161,6 +162,29 @@ int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
             size_of_code++;
 
             Code_t arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
+            size_of_code++;
+        }
+
+
+        else if(strcmp(command, "pop") == 0)
+        {
+            spu->code[size_of_code] = PUSHR;
+            size_of_code++;
+
+            int arg = 0;
+            fscanf(Input_code, "%d", &arg);
+            spu->code[size_of_code] = arg;
+            size_of_code++;
+        }
+
+        else if(strcmp(command, "pushr") == 0)
+        {
+            spu->code[size_of_code] = PUSHR;
+            size_of_code++;
+
+            int arg = 0;
             fscanf(Input_code, "%d", &arg);
             spu->code[size_of_code] = arg;
             size_of_code++;
@@ -259,6 +283,22 @@ int Write_in_file(FILE* Output_code, SPU_t* spu)
                 fprintf(Output_code, " %d\n", spu->code[i]);
                 break;
             }
+
+            case PUSHR:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+            case POP:
+            {
+                i++;
+                fprintf(Output_code, " %d\n", spu->code[i]);
+                break;
+            }
+
+
 
             default:
                 fprintf(Output_code, "\n");
