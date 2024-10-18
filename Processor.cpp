@@ -53,7 +53,12 @@ int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line)
     {
         fprintf(Dump, "## STACK = %p\n\t", &spu->stk);
         {
-            for(size_t i = 0; i < ((spu->stk.size) + 5); i++)
+            for(size_t i = 1; i < ((spu->stk.size) ); i++)
+            {
+                fprintf(Dump, "%d ", spu->stk.data[i]);
+            }
+
+            for(size_t i = 1; i < ((spu->stk.capacity) ); i++)
             {
                 fprintf(Dump, "%d ", spu->stk.data[i]);
             }

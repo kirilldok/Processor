@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
 void RunCode(SPU_t* spu)//TODO struct stk->code[]
 {
-    StackCtor(&spu->stk, 32);
+    StackCtor(&spu->stk, 8);
 
 
     spu->ip = 0;
@@ -88,6 +88,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
                 StackPush(&spu->stk, arg_2 + arg_1);
 
                 ++spu->ip;
+
                 break;
             }
 
@@ -114,6 +115,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
                 StackPush(&spu->stk, arg_1 * arg_2);
 
                 ++spu->ip;
+                SpuDump(spu);
                 break;
             }
 
@@ -124,6 +126,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
                 fprintf(stderr, "Output element = '%d' \n", arg);
 
                 ++spu->ip;
+                SpuDump(spu);
                 break;
             }
 

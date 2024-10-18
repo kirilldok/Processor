@@ -1,13 +1,13 @@
 ########################## STACK INFO ##########################
-## CALLER STACK: 0x72a958f09830
+## CALLER STACK: 0x792586509830
 ## CALLER FILE    : StackFunc.cpp
 ## CALLER FUNCTION: StackCtor
 ## LINE          = 48
 ## STACK SIZE    = 0
-## STACK CAPACIY = 32
+## STACK CAPACIY = 8
 ## LEFT STACK CANARY = 12000
 ## RIGHT STACK CANARY = 12100
-## STACK DATA PTR: 0x50d000000040
+## STACK DATA PTR: 0x504000000010
 ## DATA BUFFER: 
 ### LEFT CANARY: 13000
 # [-6666]  (1)
@@ -18,50 +18,26 @@
 # [-6666]  (6)
 # [-6666]  (7)
 # [-6666]  (8)
-# [-6666]  (9)
-# [-6666]  (10)
-# [-6666]  (11)
-# [-6666]  (12)
-# [-6666]  (13)
-# [-6666]  (14)
-# [-6666]  (15)
-# [-6666]  (16)
-# [-6666]  (17)
-# [-6666]  (18)
-# [-6666]  (19)
-# [-6666]  (20)
-# [-6666]  (21)
-# [-6666]  (22)
-# [-6666]  (23)
-# [-6666]  (24)
-# [-6666]  (25)
-# [-6666]  (26)
-# [-6666]  (27)
-# [-6666]  (28)
-# [-6666]  (29)
-# [-6666]  (30)
-# [-6666]  (31)
-# [-6666]  (32)
 ### RIGHT CANARY: 13100
-## HASH SUM: 2950326611946442783
+## HASH SUM: 10206223280825605151
 ## ERRORS: 0000000000000000
 ################################################################
 
 
 
 ########################## STACK INFO ##########################
-## CALLER STACK: 0x72a958f09830
+## CALLER STACK: 0x792586509830
 ## CALLER FILE    : StackFunc.cpp
 ## CALLER FUNCTION: Stack_Dump
 ## LINE          = 191
 ## STACK SIZE    = 1
-## STACK CAPACIY = 32
+## STACK CAPACIY = 8
 ## LEFT STACK CANARY = 12000
 ## RIGHT STACK CANARY = 12100
-## STACK DATA PTR: 0x50d000000040
+## STACK DATA PTR: 0x504000000010
 ## DATA BUFFER: 
 ### LEFT CANARY: 13000
-# [0]  (1)
+# [2]  (1)
 # [-6666]  (2)
 # [-6666]  (3)
 # [-6666]  (4)
@@ -69,138 +45,245 @@
 # [-6666]  (6)
 # [-6666]  (7)
 # [-6666]  (8)
-# [-6666]  (9)
-# [-6666]  (10)
-# [-6666]  (11)
-# [-6666]  (12)
-# [-6666]  (13)
-# [-6666]  (14)
-# [-6666]  (15)
-# [-6666]  (16)
-# [-6666]  (17)
-# [-6666]  (18)
-# [-6666]  (19)
-# [-6666]  (20)
-# [-6666]  (21)
-# [-6666]  (22)
-# [-6666]  (23)
-# [-6666]  (24)
-# [-6666]  (25)
-# [-6666]  (26)
-# [-6666]  (27)
-# [-6666]  (28)
-# [-6666]  (29)
-# [-6666]  (30)
-# [-6666]  (31)
-# [-6666]  (32)
 ### RIGHT CANARY: 13100
-## HASH SUM: 6217233729853020716
+## HASH SUM: 10206223281073427694
 ## ERRORS: 0000000000000000
 ################################################################
 
 
 
 ########################## STACK INFO ##########################
-## CALLER STACK: 0x72a958f09830
+## CALLER STACK: 0x792586509830
 ## CALLER FILE    : StackFunc.cpp
 ## CALLER FUNCTION: Stack_Dump
 ## LINE          = 191
 ## STACK SIZE    = 0
-## STACK CAPACIY = 16
+## STACK CAPACIY = 4
 ## LEFT STACK CANARY = 12000
 ## RIGHT STACK CANARY = 12100
-## STACK DATA PTR: 0x507000000020
+## STACK DATA PTR: 0x503000000040
 ## DATA BUFFER: 
 ### LEFT CANARY: 13000
 # [-6666]  (1)
 # [-6666]  (2)
 # [-6666]  (3)
 # [-6666]  (4)
-# [-6666]  (5)
-# [-6666]  (6)
-# [-6666]  (7)
-# [-6666]  (8)
-# [-6666]  (9)
-# [-6666]  (10)
-# [-6666]  (11)
-# [-6666]  (12)
-# [-6666]  (13)
-# [-6666]  (14)
-# [-6666]  (15)
-# [-6666]  (16)
 ### RIGHT CANARY: 13100
-## HASH SUM: 13722520481615321119
+## HASH SUM: 18446737125084143276
 ## ERRORS: 0000000000000000
 ################################################################
 
 
 
 ########################## STACK INFO ##########################
-## CALLER STACK: 0x72a958f09830
+## CALLER STACK: 0x792586509830
 ## CALLER FILE    : StackFunc.cpp
 ## CALLER FUNCTION: Stack_Dump
 ## LINE          = 191
 ## STACK SIZE    = 1
-## STACK CAPACIY = 16
+## STACK CAPACIY = 4
 ## LEFT STACK CANARY = 12000
 ## RIGHT STACK CANARY = 12100
-## STACK DATA PTR: 0x507000000020
+## STACK DATA PTR: 0x503000000040
 ## DATA BUFFER: 
 ### LEFT CANARY: 13000
-# [0]  (1)
+# [2]  (1)
 # [-6666]  (2)
 # [-6666]  (3)
 # [-6666]  (4)
-# [-6666]  (5)
-# [-6666]  (6)
-# [-6666]  (7)
-# [-6666]  (8)
-# [-6666]  (9)
-# [-6666]  (10)
-# [-6666]  (11)
-# [-6666]  (12)
-# [-6666]  (13)
-# [-6666]  (14)
-# [-6666]  (15)
-# [-6666]  (16)
 ### RIGHT CANARY: 13100
-## HASH SUM: 11174381269860835884
+## HASH SUM: 18446737125084143485
 ## ERRORS: 0000000000000000
 ################################################################
 
 
 
 ########################## STACK INFO ##########################
-## CALLER STACK: 0x72a958f09830
+## CALLER STACK: 0x792586509830
 ## CALLER FILE    : StackFunc.cpp
 ## CALLER FUNCTION: Stack_Dump
 ## LINE          = 191
 ## STACK SIZE    = 2
-## STACK CAPACIY = 16
+## STACK CAPACIY = 4
 ## LEFT STACK CANARY = 12000
 ## RIGHT STACK CANARY = 12100
-## STACK DATA PTR: 0x507000000020
+## STACK DATA PTR: 0x503000000040
 ## DATA BUFFER: 
 ### LEFT CANARY: 13000
-# [0]  (1)
-# [0]  (2)
+# [2]  (1)
+# [2]  (2)
 # [-6666]  (3)
 # [-6666]  (4)
-# [-6666]  (5)
-# [-6666]  (6)
-# [-6666]  (7)
-# [-6666]  (8)
-# [-6666]  (9)
-# [-6666]  (10)
-# [-6666]  (11)
-# [-6666]  (12)
-# [-6666]  (13)
-# [-6666]  (14)
-# [-6666]  (15)
-# [-6666]  (16)
 ### RIGHT CANARY: 13100
-## HASH SUM: 11174767990782913311
+## HASH SUM: 18446737125084143485
 ## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x792586509830
+## CALLER FILE    : StackFunc.cpp
+## CALLER FUNCTION: Stack_Dump
+## LINE          = 191
+## STACK SIZE    = 1
+## STACK CAPACIY = 2
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000010
+## DATA BUFFER: 
+### LEFT CANARY: 13000
+# [4]  (1)
+# [-6666]  (2)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744067328812031
+## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x792586509830
+## CALLER FILE    : StackFunc.cpp
+## CALLER FUNCTION: Stack_Dump
+## LINE          = 191
+## STACK SIZE    = 0
+## STACK CAPACIY = 2
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000010
+## DATA BUFFER: 
+### LEFT CANARY: 13000
+# [-6666]  (1)
+# [-6666]  (2)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744067328812031
+## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x792586509830
+## CALLER FILE    : StackFunc.cpp
+## CALLER FUNCTION: Stack_Dump
+## LINE          = 191
+## STACK SIZE    = 1
+## STACK CAPACIY = 2
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000010
+## DATA BUFFER: 
+### LEFT CANARY: 13000
+# [2]  (1)
+# [-6666]  (2)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744067328812031
+## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x792586509830
+## CALLER FILE    : StackFunc.cpp
+## CALLER FUNCTION: Stack_Dump
+## LINE          = 191
+## STACK SIZE    = 2
+## STACK CAPACIY = 2
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000010
+## DATA BUFFER: 
+### LEFT CANARY: 13000
+# [2]  (1)
+# [1]  (2)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744067328812031
+## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x792586509830
+## CALLER FILE    : StackFunc.cpp
+## CALLER FUNCTION: Stack_Dump
+## LINE          = 191
+## STACK SIZE    = 0
+## STACK CAPACIY = 2
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000010
+## DATA BUFFER: 
+### LEFT CANARY: 13000
+# [-6666]  (1)
+# [-6666]  (2)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744067328812031
+## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x792586509830
+## CALLER FILE    : StackFunc.cpp
+## CALLER FUNCTION: Stack_Dump
+## LINE          = 191
+## STACK SIZE    = 1
+## STACK CAPACIY = 2
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000010
+## DATA BUFFER: 
+### LEFT CANARY: 13000
+# [3]  (1)
+# [-6666]  (2)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744067328812031
+## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x792586509830
+## CALLER FILE    : StackFunc.cpp
+## CALLER FUNCTION: Stack_Dump
+## LINE          = 191
+## STACK SIZE    = 2
+## STACK CAPACIY = 2
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000010
+## DATA BUFFER: 
+### LEFT CANARY: 13000
+# [3]  (1)
+# [10]  (2)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744067328812031
+## ERRORS: 0000000000000000
+################################################################
+
+
+
+########################## STACK INFO ##########################
+## CALLER STACK: 0x792586509830
+## CALLER FILE    : Stackdebug.cpp
+## CALLER FUNCTION: StackAssert
+## LINE          = 28
+## STACK SIZE    = 18446744073709551615
+## STACK CAPACIY = 1
+## LEFT STACK CANARY = 12000
+## RIGHT STACK CANARY = 12100
+## STACK DATA PTR: 0x502000000030
+## DATA BUFFER: 
+### LEFT CANARY: -6666
+# [-6666]  (1)
+### RIGHT CANARY: 13100
+## HASH SUM: 18446744073516165609
+## ERRORS: 0001011111111110
 ################################################################
 
 
