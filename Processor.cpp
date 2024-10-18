@@ -20,15 +20,31 @@ int SPUDump_t(SPU_t* spu,  const char* file, const char* func, int line)
         "## SPU CODE PTR: %p\n",
         spu, file, func, line, spu->code_size, spu->code);
 
+
+
     fprintf(Dump, "## CODE:\n");
+
+    for(size_t i = 0; i < spu->code_size; i++)
+    {
+        fprintf(Dump, "%lu ", i);
+    }
+
+    fprintf(Dump, "\n");
 
     for(size_t i = 0; i <spu->code_size; i++)
     {
-        fprintf(Dump, "%d ", i);
+        fprintf(Dump, "%x ", spu->code[i]);
     }
+
+    fprintf(Dump, "\n");
+
+    for(size_t i = 0; i < spu->ip; i++)
+        fprintf(Dump, "#");
+    fprintf(Dump, "^ip = %lu\n", spu->ip);
 
     fprintf(stderr, "spu dumped into file\n");
 
+    fprintf(Dump, "\n################################################################\n\n\n\n");
     fclose(Dump);
 
     return 0;
