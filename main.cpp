@@ -12,11 +12,15 @@ int Read_Prog_File(FILE* Input_code, SPU_t* spu);
 int main(int argc, char* argv[])
 {
     #ifndef NDEBUG
-    FILE* clean = fopen("log.txt", "w+");
-    fclose(clean);
+    FILE* clean_log = fopen("log.txt", "w+");
+    fclose(clean_log);
     #endif
 
-    SPU_t spu = { 0 };
+    FILE* clean_dump = fopen("SPU_Dump.txt", "w+b");
+    fclose(clean_dump);
+
+
+    SPU_t spu = { };
 
 
     if (argc > 2)
@@ -41,9 +45,9 @@ int main(int argc, char* argv[])
 
 void RunCode(SPU_t* spu)//TODO struct stk->code[]
 {
+    StackCtor(&spu->stk, 32);
 
-    Stack_t stk = {};
-    StackCtor(&stk, 32);
+
     spu->ip = 0;
 
     bool Loop_flag = 1;
@@ -54,19 +58,21 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
         {
             case PUSH:
             {
-                StackPush(&stk, spu->code[++(spu->ip)]);
+                StackPush(&spu->stk, spu->code[++(spu->ip)]);
                 ++spu->ip;
+
+                SpuDump(spu);
                 break;
             }
 
             case SUB:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
-                StackPush(&stk, arg_2  - arg_1);
+                StackPush(&spu->stk, arg_2  - arg_1);
 
                 ++spu->ip;
                 break;
@@ -75,11 +81,11 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case ADD:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
-                StackPush(&stk, arg_2 + arg_1);
+                StackPush(&spu->stk, arg_2 + arg_1);
 
                 ++spu->ip;
                 break;
@@ -88,11 +94,11 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case DIV:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
-                StackPush(&stk, arg_2 / arg_1);
+                StackPush(&spu->stk, arg_2 / arg_1);
 
                 ++spu->ip;
                 break;
@@ -101,11 +107,11 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case MUL:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
-                StackPush(&stk, arg_1 * arg_2);
+                StackPush(&spu->stk, arg_1 * arg_2);
 
                 ++spu->ip;
                 break;
@@ -114,7 +120,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case OUT:
             {
                 Code_t arg = 0;
-                StackPop(&stk, &arg);
+                StackPop(&spu->stk, &arg);
                 fprintf(stderr, "Output element = '%d' \n", arg);
 
                 ++spu->ip;
@@ -123,7 +129,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
 
             case DUMP:
             {
-                Stack_Dump(&stk);
+                Stack_Dump(&spu->stk);
 
                 ++spu->ip;
                 break;
@@ -140,9 +146,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case JA:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
                 if(arg_1 > arg_2)
                 {
@@ -155,9 +161,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case JAE:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
                 if(arg_1 >= arg_2)
                 {
@@ -170,9 +176,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case JB:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
                 if(arg_1 < arg_2)
                 {
@@ -185,9 +191,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case JBE:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
                 if(arg_1 <= arg_2)
                 {
@@ -200,9 +206,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case JE:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
                 if(arg_1 == arg_2)
                 {
@@ -215,9 +221,9 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case JNE:
             {
                 Code_t arg_1 = 0;
-                StackPop(&stk, &arg_1);
+                StackPop(&spu->stk, &arg_1);
                 Code_t arg_2 = 0;
-                StackPop(&stk, &arg_2);
+                StackPop(&spu->stk, &arg_2);
 
                 if(arg_1 != arg_2)
                 {
@@ -230,23 +236,25 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
             case POP:
             {
                 Code_t arg = 0;
-                StackPop(&stk, &arg);
+                StackPop(&spu->stk, &arg);
 
                 spu->registers[spu->code[++(spu->ip)]] = arg;
                 ++spu->ip;
+                SpuDump(spu);
                 break;
             }
 
             case PUSHR:
             {
-                StackPush(&stk, spu->registers[spu->code[++(spu->ip)]]);
+                StackPush(&spu->stk, spu->registers[spu->code[++(spu->ip)]]);
                 ++spu->ip;
+                SpuDump(spu);
                 break;
             }
 
             case HLT:
             {
-                StackDtor(&stk);
+                StackDtor(&spu->stk);
                 fprintf(stderr, "Programm finished with no errors.\n");
                 Loop_flag = 0;
                 //fclose(Prog_code);
@@ -255,7 +263,7 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
 
             default:
             {
-                StackDtor(&stk);
+                StackDtor(&spu->stk);
                 fprintf(stderr, "Sintax Error: '%d'\n", spu->code[spu->ip]);
                 // fclose(Prog_code);
                 Loop_flag = 0;
@@ -269,6 +277,8 @@ void RunCode(SPU_t* spu)//TODO struct stk->code[]
 
 int Read_Prog_File(FILE* Input_code, SPU_t* spu)
 {
+
+
     fseek(Input_code, 13L , SEEK_SET);
     fscanf(Input_code, "%lu", &spu->code_size);
     //fprintf(stderr, "size = %lu\n", spu->code_size);
@@ -276,12 +286,12 @@ int Read_Prog_File(FILE* Input_code, SPU_t* spu)
     for(spu->ip = 0; spu->ip < spu->code_size; spu->ip++)
     {
         fscanf(Input_code, " %d", &spu->code[spu->ip]);
-        fprintf(stderr, " %d\n", spu->code[spu->ip]);
+        //fprintf(stderr, " %d\n", spu->code[spu->ip]);
     }
 
     //while((fscanf(Input_code, " %d", &code[ip++])) && (code[ip-1] != 0));
     spu->ip = 0;
-    
+
     SpuDump(spu);
     fclose(Input_code);
 

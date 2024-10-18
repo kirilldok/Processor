@@ -9,6 +9,7 @@
 
 enum registers
 {
+    ZX  = 0,
     AX  = 1,
     BX  = 2,
     CX  = 3,
@@ -50,9 +51,8 @@ typedef struct SPU_t
 
     Stack_t stk;
 
-    int registers[16] ;
+    int registers[16];
 } SPU_t;
-
 
 int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line);
 

@@ -58,7 +58,7 @@ int StackResize(Stack_t* stk, bool resizeflag)
     if (resizeflag)
     {
         STACK_ASSERT(stk);
-
+        //(char*)stk->data - sizeof(Canary_t) = LDC
         stk->data = (StackElem_t*)realloc(stk->data, ReallocCoef * stk->capacity * sizeof(StackElem_t) ON_DEBUG( + 2 * sizeof(Canary_t)));
         stk->capacity = ReallocCoef * stk->capacity;
 

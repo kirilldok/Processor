@@ -320,7 +320,10 @@ int Write_in_file(FILE* Output_code, SPU_t* spu)
 
 int Register_convert(char str[])
 {
-    if (strcmp(str, "ax") == 0)
+    if (strcmp(str, "zx") == 0)
+        return ZX;
+
+    else if (strcmp(str, "ax") == 0)
         return AX;
 
     else if (strcmp(str, "bx") == 0)
