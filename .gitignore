@@ -1,0 +1,10 @@
+Objects
+*.exe
+*.o
+*out
+*.save
+main
+log.txt
+compiler
+reg_code.txt
+

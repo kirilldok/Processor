@@ -9,16 +9,17 @@
 
 int StackCtor(Stack_t* stk, size_t stacklen)
 {
-    if(stacklen == NULL)
+    if(stacklen == 0)
     {
         printf("Length of stack must be a natural number!\n");
         return STACK_UNDERFLOW;
     }
     stk->capacity  = stacklen;
 
-    stk->data = (StackElem_t*)calloc(stk->capacity ON_DEBUG(+ 2), sizeof(StackElem_t));
+    char* data_with_canaries = (char*)calloc(stk->capacity ON_DEBUG(+ 2), sizeof(StackElem_t));
+    stk->data = (StackElem_t*)(data_with_canaries + sizeof(Canary_t));
 
-    if(stk->data == NULL)
+    if(data_with_canaries == NULL)
     {
         fprintf(stderr, "Dynamic Memory dead\n");
         stk->Error += ALLOC_ERROR;
@@ -27,45 +28,50 @@ int StackCtor(Stack_t* stk, size_t stacklen)
 
     stk->size = 0;
 
-
-
     #ifndef NDEBUG
         stk->RStructCanary = RightStructCanaryREF;
         stk->LStructCanary = LeftStructCanaryREF;
-        *(stk->data) = LeftDataCanaryREF;
-        *(StackElem_t*)((char*)stk->data + (stk->capacity ) * sizeof(StackElem_t) + sizeof(Canary_t)  ) = RightDataCanaryREF;
-    #endif //NDEBUG
-
-
-    for (size_t i = 0; i < stk->capacity; i++)
-    {
-        *(StackElem_t*)((char*)stk->data + i * sizeof(StackElem_t) ON_DEBUG(+ sizeof(Canary_t))) = Poison;
-    }
-
-    #ifndef NDEBUG
-        stk->HashSum = hash(stk->data, stk->capacity + 2);
+        *(Canary_t*)(data_with_canaries) = LeftDataCanaryREF;
+        *(Canary_t*)(stk->data + stk->capacity) = RightDataCanaryREF;
+        for (size_t i = 0; i < stk->capacity; i++)
+        {
+            stk->data[i] = Poison;
+        }
+        stk->HashSum = hash(stk->data, stk->capacity);
     #endif
+
     StackDump(stk);
     return NO_ERRORS;
 }
 
 
-int StackResize(Stack_t* stk, bool resizeflag)
+int StackResize(Stack_t* stk, bool Decrease)
 {
 
     STACK_ASSERT(stk);
 
-    if (resizeflag)
+    if (Decrease)
     {
         STACK_ASSERT(stk);
-        //(char*)stk->data - sizeof(Canary_t) = LDC
-        stk->data = (StackElem_t*)realloc(stk->data, ReallocCoef * stk->capacity * sizeof(StackElem_t) ON_DEBUG( + 2 * sizeof(Canary_t)));
+
+        char* data_with_canaries = (char*)realloc((char*)stk->data - sizeof(Canary_t),
+                                                        ReallocCoef *
+                                                        stk->capacity * sizeof(StackElem_t)
+                                                        ON_DEBUG( + 2 * sizeof(Canary_t)));
+        stk->data = (StackElem_t*)(data_with_canaries + sizeof(Canary_t));
+
         stk->capacity = ReallocCoef * stk->capacity;
 
 
+
         #ifndef NDEBUG
-            stk->HashSum = hash(stk->data, stk->capacity + 2);
-            *(StackElem_t*)((char*)stk->data + (stk->capacity + 1)*sizeof(StackElem_t)) = RightDataCanaryREF;
+            for (size_t i = stk->size; i < stk->capacity; i++)
+            {
+                stk->data[i] = Poison;
+            }
+            *(Canary_t*)(data_with_canaries) = LeftDataCanaryREF;
+            *(Canary_t*)(stk->data + stk->capacity) = RightDataCanaryREF;
+            stk->HashSum = hash(stk->data, stk->capacity);
         #endif
 
         STACK_ASSERT(stk);
@@ -78,12 +84,19 @@ int StackResize(Stack_t* stk, bool resizeflag)
 
         size_t new_capacity = stk->capacity / ReallocCoef;
 
-        stk->data = (StackElem_t*)realloc( stk->data, new_capacity * sizeof(StackElem_t) ON_DEBUG( + 2 * sizeof(Canary_t)));
+        char* data_with_canaries = (char*)realloc((char*)stk->data - sizeof(Canary_t),
+                                                            new_capacity *
+                                                            sizeof(StackElem_t)
+                                                            ON_DEBUG(+ 2 * sizeof(Canary_t)));
+        stk->data = (StackElem_t*)(data_with_canaries + sizeof(Canary_t));
+
         stk->capacity = new_capacity;
 
+
         #ifndef NDEBUG
-            *(StackElem_t*)((char*)stk->data + (stk->capacity) * sizeof(StackElem_t) + sizeof(Canary_t)) = RightDataCanaryREF;
-            stk->HashSum = hash(stk->data, stk->capacity + 2);
+            *(Canary_t*)(data_with_canaries) = LeftDataCanaryREF;
+            *(Canary_t*)(stk->data + stk->capacity) = RightDataCanaryREF;
+            stk->HashSum = hash(stk->data, stk->capacity);
         #endif
 
         STACK_ASSERT(stk);
@@ -98,7 +111,6 @@ int StackResize(Stack_t* stk, bool resizeflag)
 int StackPush(Stack_t* stk, StackElem_t element)
 {
 
-
     STACK_ASSERT(stk);
 
     if (stk->size  >=  stk->capacity)
@@ -106,17 +118,18 @@ int StackPush(Stack_t* stk, StackElem_t element)
         StackResize(stk, true);
     }
 
-    *(StackElem_t*)((char*)stk->data + stk->size * sizeof(StackElem_t) ON_DEBUG(+ sizeof(Canary_t))) = element;
+    stk->data[stk->size] = element;
     ++stk->size;
+    StackDump(stk);
 
-    for (size_t i = stk->size; i < stk->capacity; i++)
-    {
-        *(StackElem_t*)((char*)stk->data + i * sizeof(StackElem_t) ON_DEBUG(+ sizeof(Canary_t))) = Poison;
-    }
 
     #ifndef NDEBUG
-            *(StackElem_t*)((char*)stk->data + (stk->capacity)*sizeof(StackElem_t) + sizeof(Canary_t)) = RightDataCanaryREF;
-            stk->HashSum = hash(stk->data, stk->capacity + 2);
+        for (size_t i = stk->size; i < stk->capacity; i++)
+        {
+            stk->data[i] = Poison;
+        }
+
+        stk->HashSum = hash(stk->data, stk->capacity);
     #endif
 
     STACK_ASSERT(stk);
@@ -147,13 +160,13 @@ int StackPop(Stack_t* stk, StackElem_t* Pop_element)
 
 
     stk->size = stk->size - 1;
-    *Pop_element = *(StackElem_t*)((char*)stk->data + stk->size * sizeof(StackElem_t) ON_DEBUG(+ sizeof(Canary_t)));
-    *(StackElem_t*)((char*)stk->data + stk->size * sizeof(StackElem_t) ON_DEBUG(+ sizeof(Canary_t))) = Poison;
+    *Pop_element = stk->data[stk->size];
+
 
 
     #ifndef NDEBUG
-        *(StackElem_t*)((char*)stk->data + (stk->capacity)*sizeof(StackElem_t) + sizeof(Canary_t)) = RightDataCanaryREF;
-        stk->HashSum = hash(stk->data, stk->capacity + 2);
+        stk->data[stk->size] = Poison;
+        stk->HashSum = hash(stk->data, stk->capacity);
     #endif
 
     STACK_ASSERT(stk);
@@ -170,16 +183,25 @@ int StackDtor(Stack_t* stk)
 
     for(size_t i = 0; i < stk->size; i++)
     {
-        stk->data[i] = NULL;
+        stk->data[i] = 0;
+
     }
 
-    stk->size = NULL;
-    stk->capacity = NULL;
-    stk->LStructCanary = NULL;
-    stk->RStructCanary = NULL;
-    stk->HashSum = NULL;
+    stk->size = 0;
+    stk->capacity = 0;
 
-    free(stk->data);stk->data = NULL;
+    #ifndef NDEBUG
+        stk->LStructCanary = 0;
+        stk->RStructCanary = 0;
+        stk->HashSum = 0;
+
+       free((char*)stk->data - sizeof(Canary_t));
+       //free(stk->data);stk->data = NULL;
+    #else
+        free(stk->data);stk->data = NULL;
+    #endif
+
+    fprintf(stderr, "Stack killed\n");
 
     return NO_ERRORS;
 }

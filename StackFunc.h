@@ -20,32 +20,33 @@
 
 
 typedef int StackElem_t;
-const StackElem_t Poison = -6666;
+static const StackElem_t Poison = -6666;
 // const StackElem_t Poison = -666.6;
 
 
 enum errors
 {
-    UNDEFINED_ERROR = 13,
-    ALLOC_ERROR = 1,
-    DESTRUCTOR_ERROR = 10,
-    FILE_CREATION_ERROR = 100,
-    INPUT_ERROR = 1000,
-    STACK_UNDERFLOW = 10000,
-    STACK_PTR_IS_NULL = 100000,
-    DATA_PTR_IS_NULL = 1000000,
-    STACK_OVERFLOW = 1000000,
-    LEFT_DATA_CANARY_CORRUPTED = 10000000,
-    RIGHT_DATA_CANARY_CORRUPTED = 100000000,
-    LEFT_STACK_CANARY_CORRUPTED = 1000000000,
-    RIGHT_STACK_CANARY_CORRUPTED = 10000000000,
-    DATA_CORRUPTED = 333,
-    NO_ERRORS = 0,
+    UNDEFINED_ERROR              = 13,
+    ALLOC_ERROR                  = 1 << 0,
+    DESTRUCTOR_ERROR             = 1 << 1,
+    FILE_CREATION_ERROR          = 1 << 2,
+    INPUT_ERROR                  = 1 << 3,
+    STACK_UNDERFLOW              = 1 << 4,
+    STACK_PTR_IS_NULL            = 1 << 5,
+    DATA_PTR_IS_NULL             = 1 << 6,
+    STACK_OVERFLOW               = 1 << 7,
+    LEFT_DATA_CANARY_CORRUPTED   = 1 << 8,
+    RIGHT_DATA_CANARY_CORRUPTED  = 1 << 9,
+    LEFT_STACK_CANARY_CORRUPTED  = 1 << 10,
+    RIGHT_STACK_CANARY_CORRUPTED = 1 << 11,
+    DATA_CORRUPTED               = 1 << 12,
+    NO_ERRORS                    = 0,
 };
 
 
-const int STACK_NAME_MAX = 16;
-const int FUNC_NAME_MAX= 32;
+
+static const int STACK_NAME_MAX = 16;
+static const int FUNC_NAME_MAX= 32;
 
 typedef struct Stack_t
 {
@@ -65,14 +66,14 @@ typedef struct Stack_t
     size_t capacity;
 
 
-    size_t Error;
+    int Error;
 
     #ifndef NDEBUG
     int RStructCanary;
     #endif
 } Stack_t;
 
-const int ReallocCoef = 2;
+static const int ReallocCoef = 2;
 
 
 int StackCtor(Stack_t* stk, size_t stacklen);
@@ -82,7 +83,6 @@ int StackPop(Stack_t* stk, StackElem_t* POPelement);
 int StackResize(Stack_t* stk, bool resizeflag);
 
 int StackDtor(Stack_t* stk);
-
 int Stack_Dump(Stack_t* stk);
 //int Poising(StackElem_t* data[], size_t lenofNOTPoising, size_t ArrSize);
 
