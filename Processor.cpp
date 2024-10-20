@@ -5,7 +5,7 @@
 
 int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line)
 {
-    fprintf(stderr, "Dump opened\n");
+    //fprintf(stderr, "Dump opened\n");
     FILE* Dump = fopen("SPU_Dump.txt", "a+");
     assert(Dump);
 
@@ -47,21 +47,21 @@ int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line)
     fprintf(Dump, "ZX = %d;  AX = %d;  BX = %d;  CX = %d; DX = %d;  MLR = %d;\n",
                    spu->registers[ZX], spu->registers[AX], spu->registers[BX],
                    spu->registers[CX], spu->registers[DX], spu->registers[MLR]);
-    fprintf(stderr, "registers written\n");
+    //fprintf(stderr, "registers written\n");
 
     if ((spu->stk.capacity) != 0)
     {
         fprintf(Dump, "## STACK = %p\n\t", &spu->stk);
         {
-            for(size_t i = 1; i < ((spu->stk.size) ); i++)
+            for(size_t i = 0; i < ((spu->stk.size) ); i++)
             {
                 fprintf(Dump, "%d ", spu->stk.data[i]);
             }
 
-            for(size_t i = 1; i < ((spu->stk.capacity) ); i++)
-            {
-                fprintf(Dump, "%d ", spu->stk.data[i]);
-            }
+            // for(size_t i = 0; i < ((spu->stk.capacity) ); i++)
+            // {
+            //     fprintf(Dump, "%d ", spu->stk.data[i]);
+            // }
 
             fprintf(Dump, "\n");
         }
@@ -69,7 +69,7 @@ int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line)
     }
 
 
-    fprintf(stderr, "spu dumped into file\n");
+    //fprintf(stderr, "spu dumped into file\n");
 
 
 
