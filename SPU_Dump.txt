@@ -1,16 +1,18 @@
 ########################## SPU INFO ##########################
-## CALLER SPU: 0x7bdfc1109020
-## CALLER FILE    : main.cpp
-## CALLER FUNCTION: Read_Prog_File
-## LINE           = 299
-## SIZE OF CODE   = 24
-## SPU CODE PTR: 0x7bdfc1109020
+## CALLER SPU: 0x7f182e509040
+## CALLER FILE    : Processor.cpp
+## CALLER FUNCTION: SpuCtor
+## LINE           = 19
+## SIZE OF CODE   = 0
+## SPU CODE PTR: 0x515000000800
 ## CODE:
-	00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 
-	01 02 10 01 0f 01 0f 01 05 02 0f 01 01 01 03 10 01 0f 01 01 0a 0b 04 00 
+	
+	
 	^ip = 0
 ## REGISTERS:
 	ZX = 0;  AX = 0;  BX = 0;  CX = 0; DX = 0;  MLR = 0;
+## STACK = 0x7f182e509058
+	
 
 ################################################################
 

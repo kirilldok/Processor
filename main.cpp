@@ -4,10 +4,16 @@
 
 #include"StackFunc.h"
 #include"Processor.h"
+#include"Commands.h"
 
 
 void RunCode(SPU_t* spu);
-int Read_Prog_File(FILE* Input_code, SPU_t* spu);
+int Read_Prog_File(FILE* Input_code, SPU_t* spu, Header* hdr);
+int HeaderRead(FILE* Input_code, Header* hdr);
+FILE* Command_file_open(int argc, char** argv);
+static int UniPush(SPU_t* spu);
+static int UniPop(SPU_t* spu);
+
 
 int main(int argc, char* argv[])
 {
@@ -19,37 +25,95 @@ int main(int argc, char* argv[])
     FILE* clean_dump = fopen("SPU_Dump.txt", "w+b");
     fclose(clean_dump);
 
+    FILE* Input_code = NULL;
+    Input_code = Command_file_open(argc, argv);
 
-    SPU_t spu = { };
+    SPU_t spu = { 0 };
+    SpuCtor(&spu);
+
+    Header hdr = { 0 };
+
+    Read_Prog_File(Input_code, &spu, &hdr);
+    RunCode(&spu);
+
+    fclose(Input_code);
+    SpuDtor(&spu);
+    return 0;
+}
 
 
-    if (argc > 2)
+int Read_Prog_File(FILE* Input_code, SPU_t* spu, Header* hdr)
+{
+    assert(Input_code); assert(spu); assert(hdr);
+
+    if(HeaderRead(Input_code, hdr) != 0)
+        return HEADER_READ_ERROR;
+
+    spu->code_size = hdr->size;
+    // fprintf(stderr, "size = %u\n", spu->code_size);
+    // fprintf(stderr, "szc = %lu\n", sizeof(spu->code)/sizeof(spu->code[0]));
+    // fprintf(stderr, "szh = %lu\n", sizeof(hdr)/sizeof(uint32_t));
+
+    if (fread(&spu->code, spu->code_size, sizeof(spu->code), Input_code) == 0)
+        return BUFFERISATION_ERROR;
+    // fprintf(stderr, "wr = %lu\n", wr);
+    // fprintf(stderr, "size = %lu\n", sizeof(spu->code));
+    // fprintf(stderr, "0 = %d\n", spu->code[0]);
+    // for(spu->ip = 0; spu->ip < spu->code_size; spu->ip++)
+    // {
+    //     //fscanf(Input_code, " %d", &spu->code[spu->ip]);
+    //     fprintf(stderr, " %d\n", spu->code[spu->ip]);
+    // }
+
+    //while((fscanf(Input_code, " %d", &code[ip++])) && (code[ip-1] != 0));
+    spu->ip = 0;
+
+    //SpuDump(spu);
+    fclose(Input_code);
+
+    return NO_ERROR;
+}
+
+
+
+int HeaderRead(FILE* Input_code, Header* hdr)
+{
+    if(fread(&hdr->signature, 1, sizeof(uint32_t), Input_code) == 0)
+        return READING_ERROR;
+
+    if(fread(&hdr->version, 1, sizeof(uint32_t), Input_code) == 0)
+        return READING_ERROR;
+
+    if(fread(&hdr->size, 1, sizeof(uint32_t), Input_code) == 0)
+        return READING_ERROR;
+
+    if(fread(&hdr->reserved, 1, sizeof(uint32_t), Input_code) == 0)
+        return READING_ERROR;
+
+    return NO_ERROR;
+}
+
+FILE* Command_file_open(int argc, char** argv)
+{
+    FILE* code_file = NULL;
+
+    if(argc > 1)
     {
-        FILE* input_file = fopen(argv[1], "r");
-        Read_Prog_File(input_file, &spu);
-        RunCode(&spu);
-        //fclose(input_file);
+        code_file  = fopen(argv[1], "r+b"); assert(code_file);
     }
     else
     {
-        FILE* default_file = fopen("Machine_code.txt", "r");
-        fprintf(stderr, "No intput files. Default file Machine_code.txt opened.\n");
-        Read_Prog_File(default_file, &spu);
-        RunCode(&spu);
-        //fclose(default_file);
+        code_file = fopen("Machine_code.bin", "r+b"); assert(code_file);
     }
-
-    return 0;
+    return code_file;
 }
 
 
 void RunCode(SPU_t* spu)
 {
-    StackCtor(&spu->stk, 2);
-
+    assert(spu);
 
     spu->ip = 0;
-
     bool Loop_flag = 1;
 
     while(Loop_flag)
@@ -58,8 +122,7 @@ void RunCode(SPU_t* spu)
         {
             case PUSH:
             {
-                StackPush(&spu->stk, spu->code[++(spu->ip)]);
-                ++spu->ip;
+                UniPush(spu);
 
                 //SpuDump(spu);
                 break;
@@ -239,12 +302,7 @@ void RunCode(SPU_t* spu)
 
             case POP:
             {
-                Code_t arg = 0;
-                StackPop(&spu->stk, &arg);
-
-                spu->registers[spu->code[++(spu->ip)]] = arg;
-                ++spu->ip;
-                //SpuDump(spu);
+                UniPop(spu);
                 break;
             }
 
@@ -279,26 +337,89 @@ void RunCode(SPU_t* spu)
 }
 
 
-int Read_Prog_File(FILE* Input_code, SPU_t* spu)
+
+static int UniPush(SPU_t* spu)
 {
+    //fprintf(stderr, "## VAL FOR IP = %d\n", spu->code[spu->ip]);
+    (spu->ip)++;
+    //fprintf(stderr, "## VAL FOR IP + 1 = %d\n", spu->code[spu->ip]);
+    uint32_t ArgCode = spu->code[spu->ip];
+    uint32_t result = 0;
 
-
-    fseek(Input_code, 13L , SEEK_SET);
-    fscanf(Input_code, "%lu", &spu->code_size);
-    //fprintf(stderr, "size = %lu\n", spu->code_size);
-
-    for(spu->ip = 0; spu->ip < spu->code_size; spu->ip++)
+    if(ArgCode & REG_MASK)
     {
-        fscanf(Input_code, " %d", &spu->code[spu->ip]);
-        //fprintf(stderr, " %d\n", spu->code[spu->ip]);
+        //fprintf(stderr, "## IS REG\n");
+        (spu->ip)++;
+        result = spu->registers[spu->code[spu->ip]];
     }
 
-    //while((fscanf(Input_code, " %d", &code[ip++])) && (code[ip-1] != 0));
-    spu->ip = 0;
+    if(ArgCode & C_MASK)
+    {
+        //fprintf(stderr, "## IS C\n");
+        (spu->ip)++;
+        result += spu->code[spu->ip];
+    }
 
-    SpuDump(spu);
-    fclose(Input_code);
+    if(ArgCode & RAM_MASK)
+    {
+        //fprintf(stderr, "## IS RAM\n");
+        uint32_t addr = result;
+        result = spu->ram[addr];
+    }
 
-    return 1;
+    StackPush(spu->stk, &result);
+
+    (spu->ip)++;
+
+    return 0; //TODO err codes
 }
+
+
+static int UniPop(SPU_t* spu)
+{
+    (spu->ip)++;
+    uint32_t ArgCode = spu->code[spu->ip];
+
+    int* result = 0;
+    int  tres = 0;
+
+    if(ArgCode & REG_MASK)
+    {
+        (spu->ip)++;
+        tres = spu->code[spu->ip];
+        result = &spu->registers[spu->code[spu->ip]];
+    }
+
+    if(ArgCode & RAM_MASK)
+    {
+        if(ArgCode & REG_MASK && ArgCode & C_MASK)
+        {
+            (spu->ip)++;
+            tres += spu->code[spu->ip];
+            result = &spu->ram[tres];
+        }
+
+        else if(ArgCode & C_MASK)
+        {
+            (spu->ip)++;
+            tres = spu->code[spu->ip];
+            result = &spu->ram[tres];
+        }
+
+        else
+        {
+            (spu->ip)++;
+            result = &spu->ram[tres];
+        }
+    }
+
+    StackPop(spu->stk, result);
+
+    (spu->ip)++;
+
+    return 0; //TODO err codes
+}
+
+
+
 

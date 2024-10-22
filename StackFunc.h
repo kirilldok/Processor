@@ -20,13 +20,13 @@
 
 
 typedef int StackElem_t;
-static const StackElem_t Poison = -6666;
-// const StackElem_t Poison = -666.6;
+
+// static const StackElem_t Poison = -666.6;
 
 
 enum errors
 {
-    UNDEFINED_ERROR              = 13,
+    UNDEFINED_ERROR              = 1 << 13,
     ALLOC_ERROR                  = 1 << 0,
     DESTRUCTOR_ERROR             = 1 << 1,
     FILE_CREATION_ERROR          = 1 << 2,
@@ -73,17 +73,15 @@ typedef struct Stack_t
     #endif
 } Stack_t;
 
-static const int ReallocCoef = 2;
-
 
 int StackCtor(Stack_t* stk, size_t stacklen);
 
 int StackPush(Stack_t* stk, StackElem_t element);
 int StackPop(Stack_t* stk, StackElem_t* POPelement);
-int StackResize(Stack_t* stk, bool resizeflag);
+int StackResize(Stack_t* stk, size_t new_capacity);
 
 int StackDtor(Stack_t* stk);
 int Stack_Dump(Stack_t* stk);
-//int Poising(StackElem_t* data[], size_t lenofNOTPoising, size_t ArrSize);
+
 
 #endif

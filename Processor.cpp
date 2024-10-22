@@ -1,14 +1,40 @@
 #include "Processor.h"
-#include"StackFunc.h"
+#include "StackFunc.h"
+#include "Commands.h"
+
+static const size_t default_stack_size = 2;
+static const size_t default_max_code_size = 128;
 
 
+int SpuCtor(SPU_t* spu)
+{
+    assert(spu);
 
-int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line)
+    spu->code = (Code_t*)calloc(default_max_code_size, sizeof(Code_t)); assert(spu->code);
+    //fprintf(stderr, "size of code = %lu\n", sizeof(spu->code));
+    spu->ip = 0;
+    spu->code_size = 0;
+    StackCtor(&spu->stk, default_stack_size); assert(&spu->stk);
+
+    SpuDump(spu);
+    return 0;
+}
+
+int SpuDtor(SPU_t* spu)
+{
+    assert(spu);
+
+    StackDtor(&spu->stk);
+    free(spu->code); spu->code = NULL;
+
+    return 0;
+}
+
+int SPUDump(SPU_t* spu, const char* file, const char* func, int line)
 {
     //fprintf(stderr, "Dump opened\n");
     FILE* Dump = fopen("SPU_Dump.txt", "a+");
     assert(Dump);
-
 
     fprintf(Dump,
         "########################## SPU INFO ##########################\n"
@@ -16,26 +42,18 @@ int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line)
         "## CALLER FILE    : %s\n"
         "## CALLER FUNCTION: %s\n"
         "## LINE           = %d\n"
-        "## SIZE OF CODE   = %zu\n"
+        "## SIZE OF CODE   = %u\n"
         "## SPU CODE PTR: %p\n",
         spu, file, func, line, spu->code_size, spu->code);
-
-
 
     fprintf(Dump, "## CODE:\n\t");
     {
         for(size_t i = 0; i < spu->code_size; i++)
-        {
             fprintf(Dump, "%.2lu ", i);
-        }
-
         fprintf(Dump, "\n\t");
 
-        for(size_t i = 0; i <spu->code_size; i++)
-        {
+        for(size_t i = 0; i < spu->code_size; i++)
             fprintf(Dump, "%.2x ", (unsigned)(spu->code[i]));
-        }
-
         fprintf(Dump, "\n\t");
 
         for(size_t i = 0; i < spu->ip; i++)
@@ -58,20 +76,11 @@ int SPUDump_t(SPU_t* spu, const char* file, const char* func, int line)
                 fprintf(Dump, "%d ", spu->stk.data[i]);
             }
 
-            // for(size_t i = 0; i < ((spu->stk.capacity) ); i++)
-            // {
-            //     fprintf(Dump, "%d ", spu->stk.data[i]);
-            // }
-
             fprintf(Dump, "\n");
         }
         Stack_Dump(&spu->stk);
     }
-
-
     //fprintf(stderr, "spu dumped into file\n");
-
-
 
     fprintf(Dump, "\n################################################################\n\n\n\n");
     fclose(Dump);
