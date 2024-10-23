@@ -39,12 +39,11 @@ const char CommandNames[32][COMMANDNAME_MAX]
  "", "", "jmp", "jb", "ja","je", "jne", "jbe", "jae", "", "",
  "", "", "hlt"};
 
-typedef int Code_t;
 
 typedef struct ASM_t
 {
-    Code_t* code;
-    unsigned code_size;
+    char* code;
+    int code_size;
 
     Stack_t stk;
     LabelTable LTable;
@@ -54,11 +53,14 @@ typedef struct ASM_t
 int Convert_Code_To_Array(FILE* Input_code, ASM_t* code);
 int Write_in_file(FILE* Output_code, ASM_t* Asm);
 int Register_convert(char str[]);
+
 size_t GetFileSize(FILE* file);
-int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code);
-int AsmJump(ASM_t* Asm, char* buffer, unsigned* size_of_code);
-int AsmLabel(ASM_t* Asm, char* lmarker, char* buffer, unsigned size_of_code);
-int AsmPop(ASM_t* Asm, char* buffer, unsigned* size_of_code);
+char CommandFind(char* buffer);
+
+int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code);
+int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code);
+int ArgLabel(ASM_t* Asm, char* lmarker, char* buffer, int size_of_code);
+int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code);
 int AsmCtor(ASM_t* Asm);
 int AsmDtor(ASM_t* Asm);
 

@@ -1,14 +1,12 @@
 #include "PROGRAMM_ASM.h"
 
 
-int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code)
+int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
 {
 
     char* cptr = NULL; // pointer of begin [
     char* eptr = NULL; // pointer of end ]
     char* plusptr = NULL; // pointer of +
-    char* regArg = NULL;
-    char argBuffer[ARGLEN_MAX] = {};
     uint32_t reg = 0;
 
     if((cptr = strchr(buffer, '[')) != NULL)
@@ -22,7 +20,7 @@ int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code)
 
             if((reg = Register_convert(buffer + 1)) == -1) // buffer + (cptr - buffer)
             {
-                fprintf(stderr, "SYNTAX ERROR\n");
+                //fprintf(stderr, "SYNTAX ERROR\n");
                 return SYNTAX_ERROR;
             }
 
@@ -31,7 +29,7 @@ int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code)
 
             if((eptr = strchr(buffer, ']')) == NULL)
             {
-                fprintf(stderr, "SYNTAX ERROR\n");
+                //fprintf(stderr, "SYNTAX ERROR\n");
                 return SYNTAX_ERROR;
             }
 
@@ -45,7 +43,7 @@ int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code)
             Asm->code[*size_of_code] = RAM_REG;
             (*size_of_code)++;
 
-            //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG));
+            //fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG);
 
             Asm->code[*size_of_code] = reg;
             (*size_of_code)++;
@@ -55,7 +53,7 @@ int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code)
             Asm->code[*size_of_code] = RAM_CONSTVAL;
             (*size_of_code)++;
 
-            //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", RAM_CONSTVAL));
+            //fprintf(stderr, "## ARGTYPE = %d\n", RAM_CONSTVAL);
 
             Asm->code[*size_of_code] = atoi(buffer + 1);
             (*size_of_code)++;
@@ -70,7 +68,7 @@ int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code)
 
         if((reg = Register_convert(buffer)) == -1)
         {
-            fprintf(stderr, "SYNTAX ERROR\n");
+            //fprintf(stderr, "SYNTAX ERROR\n");
             return SYNTAX_ERROR;
         }
 
@@ -86,7 +84,7 @@ int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code)
         Asm->code[*size_of_code] = REG;
         (*size_of_code)++;
 
-        //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", REG));
+        //fprintf(stderr, "## ARGTYPER = %d\n", REG);
 
         Asm->code[*size_of_code] = reg;
         (*size_of_code)++;
@@ -98,20 +96,20 @@ int AsmPush(ASM_t* Asm, char* buffer, unsigned* size_of_code)
         Asm->code[*size_of_code] = atoi(buffer);
         (*size_of_code)++;
 
-        //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", CONSTVAL));
+        //fprintf(stderr, "## ARGTYPE = %d\n", CONSTVAL);
     }
     return 0;
 }
 
 
-int AsmJump(ASM_t* Asm, char* buffer, unsigned* size_of_code)
+int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code)
 {
     //fprintf(stderr, "## JMP ARG: %s\n", buffer));
 
     if(isdigit(buffer[0]))
     {
         Asm->code[*size_of_code + 1] = atoi(buffer);
-        //fprintf(stderr, "## JMP ARG ADDED: %d\n", atoi(buffer)));
+        //fprintf(stderr, "## JMP ARG ADDED: %d\n", atoi(buffer));
         *size_of_code += 2;                        // JUMP CODE AND ITS ARGUMENT
         return 0;
     }
@@ -139,7 +137,7 @@ int AsmJump(ASM_t* Asm, char* buffer, unsigned* size_of_code)
     }
 }
 
-int AsmLabel(ASM_t* Asm, char* lmarker, char* buffer, unsigned size_of_code)
+int ArgLabel(ASM_t* Asm, char* lmarker, char* buffer, int size_of_code)
 {
         int labVal = 0;
         *lmarker = '\0';
@@ -166,13 +164,11 @@ int AsmLabel(ASM_t* Asm, char* lmarker, char* buffer, unsigned size_of_code)
 }
 
 
-int AsmPop(ASM_t* Asm, char* buffer, unsigned* size_of_code)
+int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
 {
     char* cptr = NULL;
     char* eptr = NULL;
     char* plusptr = NULL;
-    char* regArg = NULL;
-    char argBuffer[ARGLEN_MAX] = {};
     uint32_t reg = 0;
 
     if((cptr = strchr(buffer, '[')) != NULL)

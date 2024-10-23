@@ -2,7 +2,7 @@
 #include "StackFunc.h"
 #include "Commands.h"
 
-static const size_t default_stack_size = 2;
+static const size_t default_stack_size = 4;
 static const size_t default_max_code_size = 128;
 
 
@@ -10,7 +10,7 @@ int SpuCtor(SPU_t* spu)
 {
     assert(spu);
 
-    spu->code = (Code_t*)calloc(default_max_code_size, sizeof(Code_t)); assert(spu->code);
+    spu->code = (char*)calloc(default_max_code_size, sizeof(char)); assert(spu->code);
     //fprintf(stderr, "size of code = %lu\n", sizeof(spu->code));
     spu->ip = 0;
     spu->code_size = 0;
@@ -25,7 +25,7 @@ int SpuDtor(SPU_t* spu)
     assert(spu);
 
     StackDtor(&spu->stk);
-    free(spu->code); spu->code = NULL;
+    free(spu->code); //spu->code = NULL;
 
     return 0;
 }

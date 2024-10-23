@@ -22,11 +22,11 @@ int main(int argc, char* argv[])
     fclose(clean_log);
     #endif
 
-    FILE* clean_dump = fopen("SPU_Dump.txt", "w+b");
+    FILE* clean_dump = fopen("SPU_Dump.txt", "w+");
     fclose(clean_dump);
 
     FILE* Input_code = NULL;
-    Input_code = Command_file_open(argc, argv);
+    Input_code = Command_file_open(argc, argv); assert(Input_code);
 
     SPU_t spu = { 0 };
     SpuCtor(&spu);
@@ -34,10 +34,11 @@ int main(int argc, char* argv[])
     Header hdr = { 0 };
 
     Read_Prog_File(Input_code, &spu, &hdr);
+    fclose(Input_code);
     RunCode(&spu);
 
-    fclose(Input_code);
     SpuDtor(&spu);
+
     return 0;
 }
 
@@ -50,26 +51,22 @@ int Read_Prog_File(FILE* Input_code, SPU_t* spu, Header* hdr)
         return HEADER_READ_ERROR;
 
     spu->code_size = hdr->size;
-    // fprintf(stderr, "size = %u\n", spu->code_size);
-    // fprintf(stderr, "szc = %lu\n", sizeof(spu->code)/sizeof(spu->code[0]));
-    // fprintf(stderr, "szh = %lu\n", sizeof(hdr)/sizeof(uint32_t));
 
-    if (fread(&spu->code, spu->code_size, sizeof(spu->code), Input_code) == 0)
-        return BUFFERISATION_ERROR;
+    size_t bufcount = fread(spu->code, sizeof(char), spu->code_size, Input_code);
     // fprintf(stderr, "wr = %lu\n", wr);
     // fprintf(stderr, "size = %lu\n", sizeof(spu->code));
-    // fprintf(stderr, "0 = %d\n", spu->code[0]);
-    // for(spu->ip = 0; spu->ip < spu->code_size; spu->ip++)
-    // {
-    //     //fscanf(Input_code, " %d", &spu->code[spu->ip]);
-    //     fprintf(stderr, " %d\n", spu->code[spu->ip]);
-    // }
+    //fprintf(stderr, "0 = %d\n", *spu->code);
+    //fprintf(stderr, "read = %lu; size = %d\n", bufcount, spu->code_size);
+    for(spu->ip = 0; spu->ip < hdr->size; spu->ip++)
+    {
+        //fscanf(Input_code, " %d", &spu->code[spu->ip]);
+        fprintf(stderr, " %d\n", spu->code[spu->ip]);
+    }
 
     //while((fscanf(Input_code, " %d", &code[ip++])) && (code[ip-1] != 0));
     spu->ip = 0;
 
-    //SpuDump(spu);
-    fclose(Input_code);
+    SpuDump(spu);
 
     return NO_ERROR;
 }
@@ -78,16 +75,16 @@ int Read_Prog_File(FILE* Input_code, SPU_t* spu, Header* hdr)
 
 int HeaderRead(FILE* Input_code, Header* hdr)
 {
-    if(fread(&hdr->signature, 1, sizeof(uint32_t), Input_code) == 0)
+    if(fread(&hdr->signature, sizeof(uint32_t), 1, Input_code) == 0)
         return READING_ERROR;
 
-    if(fread(&hdr->version, 1, sizeof(uint32_t), Input_code) == 0)
+    if(fread(&hdr->version, sizeof(uint32_t), 1, Input_code) == 0)
         return READING_ERROR;
 
-    if(fread(&hdr->size, 1, sizeof(uint32_t), Input_code) == 0)
+    if(fread(&hdr->size, sizeof(uint32_t), 1, Input_code) == 0)
         return READING_ERROR;
 
-    if(fread(&hdr->reserved, 1, sizeof(uint32_t), Input_code) == 0)
+    if(fread(&hdr->reserved, sizeof(uint32_t), 1, Input_code) == 0)
         return READING_ERROR;
 
     return NO_ERROR;
@@ -123,7 +120,6 @@ void RunCode(SPU_t* spu)
             case PUSH:
             {
                 UniPush(spu);
-
                 //SpuDump(spu);
                 break;
             }
@@ -316,7 +312,6 @@ void RunCode(SPU_t* spu)
 
             case HLT:
             {
-                StackDtor(&spu->stk);
                 fprintf(stderr, "Programm finished with no errors.\n");
                 Loop_flag = 0;
                 //fclose(Prog_code);
@@ -325,8 +320,7 @@ void RunCode(SPU_t* spu)
 
             default:
             {
-                StackDtor(&spu->stk);
-                fprintf(stderr, "Sintax Error: '%d'\n", spu->code[spu->ip]);
+                fprintf(stderr, "Sintax Error: '%d; ip = %d'\n", spu->code[spu->ip], spu->ip);
                 // fclose(Prog_code);
                 Loop_flag = 0;
             }
@@ -367,7 +361,7 @@ static int UniPush(SPU_t* spu)
         result = spu->ram[addr];
     }
 
-    StackPush(spu->stk, &result);
+    StackPush(&spu->stk, result);
 
     (spu->ip)++;
 
@@ -413,7 +407,7 @@ static int UniPop(SPU_t* spu)
         }
     }
 
-    StackPop(spu->stk, result);
+    StackPop(&spu->stk, result);
 
     (spu->ip)++;
 

@@ -36,7 +36,7 @@ int AsmCtor(ASM_t* Asm)
 {
     assert(Asm);
 
-    Asm->code = (Code_t*)calloc(default_max_code_size, sizeof(Code_t)); assert(Asm->code);
+    Asm->code = (char*)calloc(default_max_code_size, sizeof(char)); assert(Asm->code);
 
     Asm->LTable.labAr = LTCtor(Asm->LTable.labAr, LTLENGTH_MAX); assert(Asm->LTable.labAr);
     Asm->code_size = 0;
@@ -59,10 +59,16 @@ int AsmDtor(ASM_t* Asm)
 int Write_in_file(FILE* Output_code, ASM_t* Asm)
 {
     assert(Output_code); assert(Asm);
+    for(int i = 0; i < Asm->code_size; i++)
+    {
+        //fscanf(Input_code, " %d", &spu->code[spu->ip]);
+        fprintf(stderr, " %d\n", Asm->code[i]);
+    }
+
     uint32_t hdr[size_of_header] = {sign, ver, Asm->code_size, 0};
 
     fwrite(hdr, sizeof(hdr[0]), size_of_header, Output_code);
-    fwrite(Asm->code, sizeof(Asm->code), Asm->code_size, Output_code);
+    fwrite(Asm->code, sizeof(char), Asm->code_size, Output_code);
 
     fclose(Output_code);
     fprintf(stderr, "code has been written to file\n");
@@ -98,7 +104,7 @@ int Register_convert(char str[])
 
     else
     {
-        fprintf(stderr,"Error in register sintax\n");
+        //fprintf(stderr,"Error in register sintax\n");
         return -1;
     }
 }
@@ -116,7 +122,7 @@ size_t GetFileSize(FILE* file)
 }
 
 
-int CommandFind(char* buffer)
+char CommandFind(char* buffer)
 {
     if(strcmp(buffer, CommandNames[PUSH]) == 0)
     {
@@ -201,7 +207,7 @@ int CommandFind(char* buffer)
 int  Convert_Code_To_Array(FILE* Input_code, ASM_t* Asm)
 {
     size_t size_of_file = GetFileSize(Input_code);
-    unsigned size_of_code = 0;
+    int size_of_code = 0;
 
     while(ftell(Input_code) < size_of_file)
     {
@@ -211,33 +217,33 @@ int  Convert_Code_To_Array(FILE* Input_code, ASM_t* Asm)
         char* lmarker = NULL;
         if((lmarker  = strchr(buffer, ':')) != NULL)
         {
-            AsmLabel(Asm, lmarker, buffer, size_of_code);
+            ArgLabel(Asm, lmarker, buffer, size_of_code);
             fscanf(Input_code, "%s", buffer); assert(buffer);
         }
 
 
-        int command = CommandFind(buffer);
+        char command = CommandFind(buffer);
 
         if(command == PUSH)
         {
             Asm->code[size_of_code] = PUSH;
             size_of_code++;
             fscanf(Input_code, "%s", buffer); assert(buffer);
-            AsmPush(Asm, buffer, &size_of_code);
+            ArgPush(Asm, buffer, &size_of_code);
         }
         else if(command == JMP || command == JB || command ==  JA || command == JE ||
                 command == JNE || command == JBE || command == JAE)
         {
             Asm->code[size_of_code] = command;
             fscanf(Input_code, "%s", buffer); assert(buffer);
-            AsmJump(Asm, buffer, &size_of_code);
+            ArgJump(Asm, buffer, &size_of_code);
         }
         else if(command == POP)
         {
             Asm->code[size_of_code] = POP;
             size_of_code++;
             fscanf(Input_code, "%s", buffer); assert(buffer);
-            AsmPop(Asm, buffer, &size_of_code);
+            ArgPop(Asm, buffer, &size_of_code);
         }
         else if(command != 0)
         {
@@ -249,6 +255,7 @@ int  Convert_Code_To_Array(FILE* Input_code, ASM_t* Asm)
     }
 
     Asm->code_size = size_of_code;
+    //fprintf(stderr, "size = %d\n", Asm->code_size);
 
     return 0;
 }
