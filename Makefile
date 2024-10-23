@@ -15,13 +15,13 @@ LDFLAGS := -pie -fPIE $(SANITIZEFLAGS)
 Objects/%.o : %.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $< -c -o $@
 
-SOURCES :=  Objects/StackFunc.o Objects/Stackdebug.o Objects/hash.o Objects/Processor.o
+SOURCES :=  Objects/StackFunc.o Objects/Stackdebug.o Objects/hash.o Objects/Processor.o Objects/LableTable.o
 
 main: Objects/main.o $(SOURCES)
 	$(CXX) Objects/main.o $(SOURCES) $(LDFLAGS) -o main
 
-compiler: Objects/PROGRAMM_ASM.o $(SOURCES)
-	$(CXX) Objects/PROGRAMM_ASM.o $(SOURCES) $(LDFLAGS) -o compiler
+compiler: Objects/PROGRAMM_ASM.o Objects/Asm_Commands.o $(SOURCES)
+	$(CXX) Objects/PROGRAMM_ASM.o Objects/Asm_Commands.o $(SOURCES) $(LDFLAGS) -o compiler
 
 
 run: main

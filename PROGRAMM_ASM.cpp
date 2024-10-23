@@ -4,43 +4,65 @@
 #include<string.h>
 #include<stdint.h>
 
-#include "Processor.h"
-#include "Commands.h"
 #include "PROGRAMM_ASM.h"
 
 
 int main(int argc, const char* argv[])
 {
-    SPU_t spu = { 0 };
-    SpuCtor(&spu);
+    ASM_t Asm = { 0 };
+    AsmCtor(&Asm);
 
     if (argc > 2)
     {
         FILE* CODE_ASM = fopen( argv[1], "r"); assert(CODE_ASM);
-        Convert_Code_To_Array(CODE_ASM, &spu);
+        Convert_Code_To_Array(CODE_ASM, &Asm);
     }
     else
     {
         FILE* default_f = fopen("default_programm_code.txt", "r"); assert(default_f);
         fprintf(stderr, "No intput files. Default file opened.\n");
-        Convert_Code_To_Array(default_f, &spu);
+        Convert_Code_To_Array(default_f, &Asm);
     }
 
     FILE* Machine_code = fopen("Machine_code.bin", "w+b"); assert(Machine_code);
-    Write_in_file(Machine_code, &spu);
-    SpuDtor(&spu);
+    Write_in_file(Machine_code, &Asm);
+    AsmDtor(&Asm);
 
     return 0;
 }
 
 
-int Write_in_file(FILE* Output_code, SPU_t* spu)
+int AsmCtor(ASM_t* Asm)
 {
-    assert(Output_code); assert(spu);
-    uint32_t hdr[size_of_header] = {sign, ver, spu->code_size, 0};
+    assert(Asm);
+
+    Asm->code = (Code_t*)calloc(default_max_code_size, sizeof(Code_t)); assert(Asm->code);
+
+    Asm->LTable.labAr = LTCtor(Asm->LTable.labAr, LTLENGTH_MAX); assert(Asm->LTable.labAr);
+    Asm->code_size = 0;
+    StackCtor(&Asm->stk, LTLENGTH_MAX); assert(&Asm->stk);
+
+    return 0;
+}
+
+int AsmDtor(ASM_t* Asm)
+{
+    assert(Asm);
+
+    StackDtor(&Asm->stk);
+    LTDtor(Asm->LTable.labAr);
+    free(Asm->code); Asm->code = NULL;
+
+    return 0;
+}
+
+int Write_in_file(FILE* Output_code, ASM_t* Asm)
+{
+    assert(Output_code); assert(Asm);
+    uint32_t hdr[size_of_header] = {sign, ver, Asm->code_size, 0};
 
     fwrite(hdr, sizeof(hdr[0]), size_of_header, Output_code);
-    fwrite(spu->code, sizeof(spu->code), spu->code_size, Output_code);
+    fwrite(Asm->code, sizeof(Asm->code), Asm->code_size, Output_code);
 
     fclose(Output_code);
     fprintf(stderr, "code has been written to file\n");
@@ -176,7 +198,7 @@ int CommandFind(char* buffer)
         return 0;
 }
 
-int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
+int  Convert_Code_To_Array(FILE* Input_code, ASM_t* Asm)
 {
     size_t size_of_file = GetFileSize(Input_code);
     unsigned size_of_code = 0;
@@ -186,251 +208,122 @@ int  Convert_Code_To_Array(FILE* Input_code, SPU_t* spu)
         char buffer[COMMANDNAME_MAX] = {};
         fscanf(Input_code, "%s", buffer);
 
+        char* lmarker = NULL;
+        if((lmarker  = strchr(buffer, ':')) != NULL)
+        {
+            AsmLabel(Asm, lmarker, buffer, size_of_code);
+            fscanf(Input_code, "%s", buffer); assert(buffer);
+        }
+
+
         int command = CommandFind(buffer);
 
         if(command == PUSH)
         {
-            spu->code[size_of_code] = PUSH;
+            Asm->code[size_of_code] = PUSH;
             size_of_code++;
-
-            if(fscanf(Input_code, "%s", buffer) == 0)
-            {
-                return READING_ERROR;
-            }
-
-            AsmPush(spu, buffer, &size_of_code);
+            fscanf(Input_code, "%s", buffer); assert(buffer);
+            AsmPush(Asm, buffer, &size_of_code);
         }
-
         else if(command == JMP || command == JB || command ==  JA || command == JE ||
                 command == JNE || command == JBE || command == JAE)
         {
-            spu->code[size_of_code] = command;
-            if(fscanf(Input_code, "%s", buffer) == 0)
-            {
-                return READING_ERROR;
-            }
-
-            AsmJump(spu, buffer, &size_of_code);
-
+            Asm->code[size_of_code] = command;
+            fscanf(Input_code, "%s", buffer); assert(buffer);
+            AsmJump(Asm, buffer, &size_of_code);
         }
-
-
+        else if(command == POP)
+        {
+            Asm->code[size_of_code] = POP;
+            size_of_code++;
+            fscanf(Input_code, "%s", buffer); assert(buffer);
+            AsmPop(Asm, buffer, &size_of_code);
+        }
+        else if(command != 0)
+        {
+            Asm->code[size_of_code] = command;
+            size_of_code++;
+        }
+        else
+            size_of_code++;
     }
+
+    Asm->code_size = size_of_code;
 
     return 0;
 }
 
 
-
-int AsmPush(Spu_t* spu, char* buffer, int* size_of_code)
-{
-
-    char* cptr = NULL; // pointer of begin [
-    char* eptr = NULL; // pointer of end ]
-    char* plusptr = NULL; // pointer of +
-    char* regArg = NULL;
-    char argBuffer[ARGLEN_MAX] = {};
-    uint32_t reg = 0;
-
-    if((cptr = strchr(buffer, '[')) != NULL)
-    {
-        if((plusptr = strchr(buffer, '+')) != NULL)
-        {
-            spu->code[*size_of_code] = RAM_REG_CONSTVAL;
-            (*size_of_code)++;
-
-            //fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG_CONSTVAL);
-
-            if((reg = Register_convert(buffer + 1)) == -1) // buffer + (cptr - buffer)
-            {
-                fprintf(stderr, "SYNTAX ERROR\n");
-                return SYNTAX_ERROR;
-            }
-
-            spu->code[*size_of_code] = reg;
-            (*size_of_code)++;
-
-            if((eptr = strchr(buffer, ']')) == NULL)
-            {
-                fprintf(stderr, "SYNTAX ERROR\n");
-                return SYNTAX_ERROR;
-            }
-
-
-            spu->code[*size_of_code] = atoi(buffer + (eptr - plusptr + 1));
-            (*size_of_code)++;
-        }
-
-        else if((rg = Register_convert(buffer + 1)) != -1) // buffer + (cptr - buffer)
-        {
-            spu->code[*size_of_code] = RAM_REG;
-            (*size_of_code)++;
-
-            //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG));
-
-            spu->code[*size_of_code] = reg;
-            (*size_of_code)++;
-        }
-        else
-        {
-            spu->code[*size_of_code] = RAM_CONSTVAL;
-            (*size_of_code)++;
-
-            //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", RAM_CONSTVAL));
-
-            spu->code[*size_of_code] = atoi(buffer + 1);
-            (*size_of_code)++;
-        }
-    }
-    else if((plusptr = strchr(buffer, '+')) != NULL)
-    {
-        spu->code[*size_of_code] = REG_CONSTVAL;
-        (*size_of_code)++;
-
-        ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", REG_CONSTVAL));
-
-        if((reg = Register_convert(buffer)) == -1)
-        {
-            fprintf(stderr, "SYNTAX ERROR\n");
-            return SYNTAX_ERROR;
-        }
-
-        spu->code[*size_of_code] = reg;
-        (*size_of_code)++;
-
-        spu->code[*size_of_code] = atoi(buffer + (plusptr - buffer) + 1);
-        (*size_of_code)++;
-
-    }
-    else if((reg = Register_convert(buffer)) != -1)
-    {
-        spu->code[*size_of_code] = REG;
-        (*size_of_code)++;
-
-        //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", REG));
-
-        spu->code[*size_of_code] = reg;
-        (*size_of_code)++;
-    }
-    else
-    {
-        spu->code[*size_of_code] = CONSTVAL;
-        (*size_of_code)++;
-        spu_code[*size_of_code] = atoi(buffer);
-        (*size_of_code)++;
-
-        //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", CONSTVAL));
-    }
-    return 0;
-}
-
-
-int AsmJump(SPU_t* spu, char* buffer, int* size_of_code)
-{
-    //fprintf(stderr, "## JMP ARG: %s\n", buffer));
-
-    if(isdigit(buffer[0]))
-    {
-        spu->code[*size_of_code + 1] = atoi(buffer);
-        //fprintf(stderr, "## JMP ARG ADDED: %d\n", atoi(buffer)));
-        *size_of_code += 2;                        // JUMP CODE AND ITS ARGUMENT
-        return 0;
-    }
-
-    else
-    {
-        int labVal = 0;
-
-        if((labVal = FindLabel(&Asm->LTable, buffer)) == -1) // LABEL IS NOT IN THE TABLE YET
-        {
-            strncpy(Asm->LTable.labAr[Asm->LTable.lnum].name, buffer, COMMANDNAME_MAX);
-            Asm->LTable.lnum++;
-            *cycleIndex += 2;   // JUMP CODE AND ITS ARGUMENT
-            ON_DEBUG(fprintf(stderr, "## LABEL NAME ADDED: %s\n", buffer));
-            ON_DEBUG(LTDump(&Asm->LTable));
-            return 0;
-        }
-
-        else
-        {
-            spu->code[*size_of_code + 1] = spu->LTable.labAr[labVal].ipTarg;
-            *cycleIndex += 2;                    // JUMP CODE AND ITS ARGUMENT
-            return 0;
-        }
-    }
-}
-
-
-        //fprintf(Output_code, "%d", spu->code[i]);
-//         switch(spu->code[i])
+        //fprintf(Output_code, "%d", Asm->code[i]);
+//         switch(Asm->code[i])
 //         {
 //             case PUSH:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case JMP:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case JA:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case JAE:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case JB:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case JBE:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case JE:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case JNE:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case PUSHR:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //
 //             case POP:
 //             {
 //                 i++;
-//                 fprintf(Output_code, " %d\n", spu->code[i]);
+//                 fprintf(Output_code, " %d\n", Asm->code[i]);
 //                 break;
 //             }
 //

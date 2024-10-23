@@ -1,4 +1,4 @@
-#include "LabelTable.h"
+#include "LableTable.h"
 
 
 label* LTCtor(label* LT, size_t size)
