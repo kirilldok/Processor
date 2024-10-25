@@ -119,6 +119,7 @@ void RunCode(SPU_t* spu)
         {
             case PUSH:
             {
+                (spu->ip)++;
                 UniPush(spu);
                 //SpuDump(spu);
                 break;
@@ -298,17 +299,11 @@ void RunCode(SPU_t* spu)
 
             case POP:
             {
+                (spu->ip)++;
                 UniPop(spu);
                 break;
             }
 
-            case PUSHR:
-            {
-                StackPush(&spu->stk, spu->registers[spu->code[++(spu->ip)]]);
-                ++spu->ip;
-                //SpuDump(spu);
-                break;
-            }
 
             case HLT:
             {
@@ -335,7 +330,6 @@ void RunCode(SPU_t* spu)
 static int UniPush(SPU_t* spu)
 {
     //fprintf(stderr, "## VAL FOR IP = %d\n", spu->code[spu->ip]);
-    (spu->ip)++;
     //fprintf(stderr, "## VAL FOR IP + 1 = %d\n", spu->code[spu->ip]);
     uint32_t ArgCode = spu->code[spu->ip];
     uint32_t result = 0;
@@ -371,7 +365,6 @@ static int UniPush(SPU_t* spu)
 
 static int UniPop(SPU_t* spu)
 {
-    (spu->ip)++;
     uint32_t ArgCode = spu->code[spu->ip];
 
     int* result = 0;
@@ -413,7 +406,3 @@ static int UniPop(SPU_t* spu)
 
     return 0; //TODO err codes
 }
-
-
-
-

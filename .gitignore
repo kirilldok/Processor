@@ -1,10 +1,10 @@
 Objects
 *.exe
 *.o
-*out
+*.out
 *.save
-main
-log.txt
-compiler
-reg_code.txt
+*main
+*log.txt
+*compiler
+*reg_code.txt
 

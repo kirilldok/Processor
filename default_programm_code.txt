@@ -1,5 +1,6 @@
 push 2
 pop ax
+127:
 push ax
 push ax
 mul
@@ -10,5 +11,5 @@ add
 pop ax
 push ax
 push 10
-jb 4
+jb 127:
 hlt

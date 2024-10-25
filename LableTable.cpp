@@ -24,7 +24,7 @@ int LTDtor(label* LT)
 
 int LTDumpf(LabelTable* LT)
 {
-    FILE* fp =  fopen("02LTDUMP", "w+b");
+    FILE* fp =  fopen("LT_DUMP.txt", "w+b");
     if(fp == 0)
     {
         fprintf(stderr, "FIle reading error, can't dump\n");
@@ -33,7 +33,7 @@ int LTDumpf(LabelTable* LT)
 
     fprintf(stderr, "sizeof(LT->labAr) / sizeof(label) = %zu\n", sizeof(LT->labAr) / sizeof(label));
 
-    for(size_t i = 0; i < (sizeof(LT->labAr) / sizeof(label)); i++)
+    for(size_t i = 0; i < LT->lnum; i++)
     {
         fprintf(fp, "#### [%zu]   %d : \"%32s\"", i, LT->labAr[i].ipTarg, LT->labAr[i].name);
         if(i == LT->lnum)

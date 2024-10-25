@@ -1,4 +1,4 @@
-#ifndef ASSEMLER_INCLUDED
+#ifndef ASSEMBLER_INCLUDED
 #define ASSEMBLER_INCLUDED
 
 #include<stdio.h>
@@ -34,33 +34,44 @@ const size_t ARGLEN_MAX = 64;
 static const size_t default_max_code_size = 128;
 
 const char CommandNames[32][COMMANDNAME_MAX]
-{"", "push", "pushr", "add", "sub", "div", "mul", "pow",
- "sqrt", "sin", "", "pop", "", "", "", "", "out", "dump",
- "", "", "jmp", "jb", "ja","je", "jne", "jbe", "jae", "", "",
+{"", "push", "", "add", "sub", "div", "mul", "pow",
+ "sqrt", "sin", "", "pop", "", "", "", "", "out", "",
+ "", "", "jmp", "jb", "ja","je", "jne", "jbe", "jae", "dump", "",
  "", "", "hlt"};
+
+
+typedef struct asm_sheet
+{
+    char* source;
+    size_t size;
+} asmsht;
 
 
 typedef struct ASM_t
 {
     char* code;
-    int code_size;
-
+    uint32_t code_size;
     Stack_t stk;
     LabelTable LTable;
 
+    asmsht sheet;
 } ASM_t;
 
-int Convert_Code_To_Array(FILE* Input_code, ASM_t* code);
+FILE* Command_file_open(int argc, const char** argv);
+int Convert_Code_To_Array(ASM_t* Asm);
 int Write_in_file(FILE* Output_code, ASM_t* Asm);
-int Register_convert(char str[]);
+int32_t Register_convert(char* buffer);
 
-size_t GetFileSize(FILE* file);
-char CommandFind(char* buffer);
+int Bufferize_file(FILE* CODE_ASM, ASM_t* Asm);
+long GetFileSize(FILE* file);
+int GetCommand(ASM_t* Asm, char* buffer, size_t* been_read);
+int CommandFind(char* buffer);
 
 int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code);
 int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code);
 int ArgLabel(ASM_t* Asm, char* lmarker, char* buffer, int size_of_code);
 int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code);
+
 int AsmCtor(ASM_t* Asm);
 int AsmDtor(ASM_t* Asm);
 
