@@ -46,8 +46,8 @@ int main(int argc, const char* argv[])
 int Bufferize_file(FILE* CODE_ASM, ASM_t* Asm)
 {
     Asm->sheet.size = GetFileSize(CODE_ASM);
-    Asm->sheet.source = (char*)calloc(Asm->sheet.size, sizeof(char));
-    if(fread(Asm->sheet.source, Asm->sheet.size, sizeof(char), CODE_ASM) == 0)
+    Asm->sheet.source = (char*)calloc(Asm->sheet.size, sizeof(Code_t));
+    if(fread(Asm->sheet.source, Asm->sheet.size, sizeof(Code_t), CODE_ASM) == 0)
     {
         fprintf(stderr, "Reading error\n");
         return READING_ERROR;
@@ -74,7 +74,7 @@ int AsmCtor(ASM_t* Asm)
 {
     assert(Asm);
 
-    Asm->code = (char*)calloc(default_max_code_size, sizeof(char)); assert(Asm->code);
+    Asm->code = (Code_t*)calloc(default_max_code_size, sizeof(Code_t)); assert(Asm->code);
 
     Asm->LTable.labAr = LTCtor(Asm->LTable.labAr, LTLENGTH_MAX); assert(Asm->LTable.labAr);
     Asm->code_size = 0;
@@ -120,13 +120,13 @@ int Write_in_file(FILE* Output_code, ASM_t* Asm)
     for(int i = 0; i < Asm->code_size; i++)
     {
         //fscanf(Input_code, " %d", &spu->code[spu->ip]);
-        fprintf(stderr, " %d\n", Asm->code[i]);
+        fprintf(stderr, " %lg\n", Asm->code[i]);
     }
 
     uint32_t hdr[size_of_header] = {sign, ver, Asm->code_size, 0};
 
     fwrite(hdr, sizeof(hdr[0]), size_of_header, Output_code);
-    fwrite(Asm->code, sizeof(char), Asm->code_size, Output_code);
+    fwrite(Asm->code, sizeof(Code_t), Asm->code_size, Output_code);
 
     fprintf(stderr, "code has been written to file\n");
     return 0;
@@ -209,7 +209,7 @@ int  Convert_Code_To_Array(ASM_t* Asm)
         char* lmarker = NULL;
         if((lmarker  = strchr(buffer, ':')) != NULL)
         {
-            ArgLabel(Asm, lmarker, buffer, size_of_code);
+            ArgLabel(Asm, buffer, size_of_code, lmarker);
             fprintf(stderr, "buffer in loop =  %s\n", buffer);
 
 
@@ -236,7 +236,7 @@ int  Convert_Code_To_Array(ASM_t* Asm)
 
         if(command == PUSH)
         {
-            Asm->code[size_of_code] = (char)PUSH;
+            Asm->code[size_of_code] = (Code_t)PUSH;
             size_of_code++;
 
             if(GetCommand(Asm, buffer, &been_read) != 0)
@@ -250,7 +250,10 @@ int  Convert_Code_To_Array(ASM_t* Asm)
         else if(command == JMP || command == JB || command ==  JA || command == JE ||
                 command == JNE || command == JBE || command == JAE)
         {
-            Asm->code[size_of_code] = (char)command;
+            fprintf(stderr, "jump code = %lg\n", Asm->code[size_of_code]);
+            Asm->code[size_of_code] = (Code_t)command;
+            fprintf(stderr, "jump code = %lg\n", Asm->code[size_of_code]);
+            size_of_code++;
 
             if(GetCommand(Asm, buffer, &been_read) != 0)
             {
@@ -262,7 +265,7 @@ int  Convert_Code_To_Array(ASM_t* Asm)
 
         else if(command == POP)
         {
-            Asm->code[size_of_code] = (char)POP;
+            Asm->code[size_of_code] = (Code_t)POP;
             size_of_code++;
 
             if(GetCommand(Asm, buffer, &been_read) != 0)
@@ -275,7 +278,7 @@ int  Convert_Code_To_Array(ASM_t* Asm)
         }
         else if(command != 0)
         {
-            Asm->code[size_of_code] = (char)command;
+            Asm->code[size_of_code] = (Code_t)command;
             size_of_code++;
         }
         else

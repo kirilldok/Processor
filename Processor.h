@@ -24,9 +24,6 @@ enum ErrCodes
     HEADER_READ_ERROR,
 };
 
-typedef int Code_t;
-
-
 
 const uint32_t RAM_MASK = 4;
 const uint32_t REG_MASK = 2;
@@ -35,14 +32,14 @@ const uint32_t C_MASK = 1;
 
 typedef struct SPU_t
 {
-    char* code;
+    Code_t* code;
     size_t ip;
-    int code_size;
+    size_t code_size;
 
     Stack_t stk;
 
     Code_t registers[16];
-    int ram[512];
+    Code_t ram[512];
 } SPU_t;
 
 int SpuCtor(SPU_t* spu);

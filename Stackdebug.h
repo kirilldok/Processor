@@ -19,7 +19,7 @@
 #define ON_DEBUG(code) code
 #endif
 
-typedef int Canary_t;
+typedef double Canary_t;
 
 
 

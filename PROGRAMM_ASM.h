@@ -40,6 +40,7 @@ const char CommandNames[32][COMMANDNAME_MAX]
  "", "", "hlt"};
 
 
+
 typedef struct asm_sheet
 {
     char* source;
@@ -49,7 +50,7 @@ typedef struct asm_sheet
 
 typedef struct ASM_t
 {
-    char* code;
+    Code_t* code;
     uint32_t code_size;
     Stack_t stk;
     LabelTable LTable;
@@ -69,7 +70,7 @@ int CommandFind(char* buffer);
 
 int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code);
 int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code);
-int ArgLabel(ASM_t* Asm, char* lmarker, char* buffer, int size_of_code);
+int ArgLabel(ASM_t* Asm, char* buffer, int size_of_code, char* lmarker);
 int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code);
 
 int AsmCtor(ASM_t* Asm);

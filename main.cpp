@@ -52,7 +52,7 @@ int Read_Prog_File(FILE* Input_code, SPU_t* spu, Header* hdr)
 
     spu->code_size = hdr->size;
 
-    size_t bufcount = fread(spu->code, sizeof(char), spu->code_size, Input_code);
+    size_t bufcount = fread(spu->code, sizeof(Code_t), spu->code_size, Input_code);
     // fprintf(stderr, "wr = %lu\n", wr);
     // fprintf(stderr, "size = %lu\n", sizeof(spu->code));
     //fprintf(stderr, "0 = %d\n", *spu->code);
@@ -60,7 +60,7 @@ int Read_Prog_File(FILE* Input_code, SPU_t* spu, Header* hdr)
     for(spu->ip = 0; spu->ip < hdr->size; spu->ip++)
     {
         //fscanf(Input_code, " %d", &spu->code[spu->ip]);
-        fprintf(stderr, " %d\n", spu->code[spu->ip]);
+        fprintf(stderr, " %lg\n", spu->code[spu->ip]);
     }
 
     //while((fscanf(Input_code, " %d", &code[ip++])) && (code[ip-1] != 0));
@@ -115,7 +115,7 @@ void RunCode(SPU_t* spu)
 
     while(Loop_flag)
     {
-        switch(spu->code[spu->ip])
+        switch((int)spu->code[spu->ip])
         {
             case PUSH:
             {
@@ -176,7 +176,7 @@ void RunCode(SPU_t* spu)
                 StackPush(&spu->stk, arg_1 * arg_2);
 
                 ++spu->ip;
-                //SpuDump(spu);
+                SpuDump(spu);
                 break;
             }
 
@@ -184,10 +184,10 @@ void RunCode(SPU_t* spu)
             {
                 Code_t arg = 0;
                 StackPop(&spu->stk, &arg);
-                fprintf(stderr, "Output element = '%d' \n", arg);
+                fprintf(stderr, "Output element = '%lg' \n", arg);
 
                 ++spu->ip;
-                //SpuDump(spu);
+                SpuDump(spu);
                 break;
             }
 
@@ -248,7 +248,7 @@ void RunCode(SPU_t* spu)
                     spu->ip = (size_t)spu->code[spu->ip + 1];
                 else
                     spu->ip += 2;
-                //SpuDump(spu);
+                SpuDump(spu);
                 break;
             }
 
@@ -304,7 +304,6 @@ void RunCode(SPU_t* spu)
                 break;
             }
 
-
             case HLT:
             {
                 fprintf(stderr, "Programm finished with no errors.\n");
@@ -315,7 +314,7 @@ void RunCode(SPU_t* spu)
 
             default:
             {
-                fprintf(stderr, "Sintax Error: '%d; ip = %d'\n", spu->code[spu->ip], spu->ip);
+                fprintf(stderr, "Sintax Error: '%lg; ip = %lu'\n", spu->code[spu->ip], spu->ip);
                 // fclose(Prog_code);
                 Loop_flag = 0;
             }
@@ -331,14 +330,14 @@ static int UniPush(SPU_t* spu)
 {
     //fprintf(stderr, "## VAL FOR IP = %d\n", spu->code[spu->ip]);
     //fprintf(stderr, "## VAL FOR IP + 1 = %d\n", spu->code[spu->ip]);
-    uint32_t ArgCode = spu->code[spu->ip];
-    uint32_t result = 0;
+    uint32_t ArgCode = (int)spu->code[spu->ip];
+    Code_t result = 0;
 
     if(ArgCode & REG_MASK)
     {
         //fprintf(stderr, "## IS REG\n");
         (spu->ip)++;
-        result = spu->registers[spu->code[spu->ip]];
+        result = spu->registers[(int)spu->code[spu->ip]];
     }
 
     if(ArgCode & C_MASK)
@@ -365,16 +364,16 @@ static int UniPush(SPU_t* spu)
 
 static int UniPop(SPU_t* spu)
 {
-    uint32_t ArgCode = spu->code[spu->ip];
+    uint32_t ArgCode = (uint32_t)spu->code[spu->ip];
 
-    int* result = 0;
+    Code_t* result = 0;
     int  tres = 0;
 
     if(ArgCode & REG_MASK)
     {
         (spu->ip)++;
-        tres = spu->code[spu->ip];
-        result = &spu->registers[spu->code[spu->ip]];
+        tres = (int)spu->code[spu->ip];
+        result = &spu->registers[tres];
     }
 
     if(ArgCode & RAM_MASK)
@@ -382,14 +381,14 @@ static int UniPop(SPU_t* spu)
         if(ArgCode & REG_MASK && ArgCode & C_MASK)
         {
             (spu->ip)++;
-            tres += spu->code[spu->ip];
+            tres += (int)spu->code[spu->ip];
             result = &spu->ram[tres];
         }
 
         else if(ArgCode & C_MASK)
         {
             (spu->ip)++;
-            tres = spu->code[spu->ip];
+            tres = (int)spu->code[spu->ip];
             result = &spu->ram[tres];
         }
 

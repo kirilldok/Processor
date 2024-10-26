@@ -37,6 +37,8 @@ const uint32_t REG_CONSTVAL = 3;
 const uint32_t REG = 2;
 const uint32_t CONSTVAL = 1;
 
+typedef double Code_t;
+
 typedef struct Header
 {
     uint32_t signature;

@@ -19,7 +19,7 @@
 
 
 
-typedef int StackElem_t;
+typedef double StackElem_t;
 
 // static const StackElem_t Poison = -666.6;
 

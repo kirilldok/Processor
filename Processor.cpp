@@ -9,7 +9,7 @@ int SpuCtor(SPU_t* spu)
 {
     assert(spu);
 
-    spu->code = (char*)calloc(default_max_code_size, sizeof(char)); assert(spu->code);
+    spu->code = (Code_t*)calloc(default_max_code_size, sizeof(Code_t)); assert(spu->code);
     //fprintf(stderr, "size of code = %lu\n", sizeof(spu->code));
     spu->ip = 0;
     spu->code_size = 0;
@@ -61,7 +61,7 @@ int SPUDump(SPU_t* spu, const char* file, const char* func, int line)
     }
 
     fprintf(Dump, "## REGISTERS:\n\t");
-    fprintf(Dump, "ZX = %d;  AX = %d;  BX = %d;  CX = %d; DX = %d;  MLR = %d;\n",
+    fprintf(Dump, "ZX = %lg;  AX = %lg;  BX = %lg;  CX = %lg; DX = %lg;  MLR = %lg;\n",
                    spu->registers[ZX], spu->registers[AX], spu->registers[BX],
                    spu->registers[CX], spu->registers[DX], spu->registers[MLR]);
     //fprintf(stderr, "registers written\n");

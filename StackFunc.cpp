@@ -5,7 +5,7 @@
 #include "StackFunc.h"
 #include "Stackdebug.h"
 
-static const StackElem_t Poison = -6666;
+static const StackElem_t Poison = -666.6;
 static const int ReallocCoef = 2;
 
 

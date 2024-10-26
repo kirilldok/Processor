@@ -143,22 +143,22 @@ int _StackDump(Stack_t* stk, const char* file, const char* func, int line)
     fprintf(log, "## DATA BUFFER: \n");
 
     if ((stk->Error & LEFT_DATA_CANARY_CORRUPTED) != 0)
-        fprintf(log, "### LEFT CANARY: %d\n", *(Canary_t*)((char*)stk->data - sizeof(Canary_t)));
+        fprintf(log, "### LEFT CANARY: %lg\n", *(Canary_t*)((char*)stk->data - sizeof(Canary_t)));
 
     if((stk->capacity < MAX_OUTPUT_STACK) && (stk->size < MAX_OUTPUT_STACK))
     {
         for(size_t i = 0; i < stk->capacity; i++)
-            fprintf(log, "# [%d]  (%zu)\n", stk->data[i], i);
+            fprintf(log, "# [%lg]  (%zu)\n", stk->data[i], i);
     }
     else
     {
         for(size_t i = 0; i < stk->size; i++)
-            fprintf(log, "# [%d]  (%zu)\n", stk->data[i], i);
+            fprintf(log, "# [%lg]  (%zu)\n", stk->data[i], i);
     }
 
 
     if ((stk->Error & RIGHT_DATA_CANARY_CORRUPTED ) != 0)
-        fprintf(log, "### RIGHT CANARY: %d\n", *(Canary_t*)(stk->data + stk->capacity));
+        fprintf(log, "### RIGHT CANARY: %lg\n", *(Canary_t*)(stk->data + stk->capacity));
 
     fprintf(log, "## HASH SUM: %zu\n", stk->HashSum);
     fprintf(log, "## ERRORS: ");
@@ -260,4 +260,3 @@ int _StackDump(Stack_t* stk, const char* file, const char* func, int line)
 //
 //     return NO_ERRORS;
 // }
-
