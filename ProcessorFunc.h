@@ -28,6 +28,7 @@ enum ErrCodes
 const uint32_t RAM_MASK = 4;
 const uint32_t REG_MASK = 2;
 const uint32_t C_MASK = 1;
+static const size_t RAM_SIZE = 8;
 
 
 typedef struct SPU_t
@@ -37,9 +38,10 @@ typedef struct SPU_t
     size_t code_size;
 
     Stack_t stk;
+    Stack_t return_codes;
 
     Code_t registers[16];
-    Code_t ram[512];
+    Code_t ram[RAM_SIZE];
 } SPU_t;
 
 int SpuCtor(SPU_t* spu);

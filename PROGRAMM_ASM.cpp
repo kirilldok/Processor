@@ -117,11 +117,11 @@ FILE* Command_file_open(int argc, const char** argv)
 int Write_in_file(FILE* Output_code, ASM_t* Asm)
 {
     assert(Output_code); assert(Asm);
-    for(int i = 0; i < Asm->code_size; i++)
-    {
-        //fscanf(Input_code, " %d", &spu->code[spu->ip]);
-        fprintf(stderr, " %lg\n", Asm->code[i]);
-    }
+    // for(int i = 0; i < Asm->code_size; i++)
+    // {
+    //     //fscanf(Input_code, " %d", &spu->code[spu->ip]);
+    //     fprintf(stderr, " %lg\n", Asm->code[i]);
+    // }
 
     uint32_t hdr[size_of_header] = {sign, ver, Asm->code_size, 0};
 
@@ -172,7 +172,7 @@ int GetCommand(ASM_t* Asm, char* buffer, size_t* been_read)
     strncpy(buffer, Asm->sheet.source + *been_read, sizebuf);
     buffer[sizebuf] = '\0';
 
-    fprintf(stderr, "buffer = %s\n", buffer);
+    //fprintf(stderr, "buffer = %s\n", buffer);
     *been_read += commandptr - (Asm->sheet.source + *been_read) + 1; // +1 SO NEXT STRCHR DOESN'T INCLUDE LAST SEPARATION MARK
     //fprintf(stderr, " size of code = %zu\n", *been_read);
     return 0;
@@ -210,11 +210,9 @@ int  Convert_Code_To_Array(ASM_t* Asm)
         if((lmarker  = strchr(buffer, ':')) != NULL)
         {
             ArgLabel(Asm, buffer, size_of_code, lmarker);
-            fprintf(stderr, "buffer in loop =  %s\n", buffer);
-
-
+            //fprintf(stderr, "buffer in loop =  %s\n", buffer);
             size_t buflen = strlen(buffer);
-            fprintf(stderr, "buflen = %lu\n", buflen);
+            //fprintf(stderr, "buflen = %lu\n", buflen);
             for(size_t i = 0; i < buflen; i++)
             {
                 buffer[i] = '\0';
@@ -222,7 +220,7 @@ int  Convert_Code_To_Array(ASM_t* Asm)
 
 
 
-            fprintf(stderr, "buffer in loop =  %s\n", buffer);
+            //fprintf(stderr, "buffer in loop =  %s\n", buffer);
 
             if(GetCommand(Asm, buffer, &been_read) != 0)
             {
@@ -250,9 +248,9 @@ int  Convert_Code_To_Array(ASM_t* Asm)
         else if(command == JMP || command == JB || command ==  JA || command == JE ||
                 command == JNE || command == JBE || command == JAE)
         {
-            fprintf(stderr, "jump code = %lg\n", Asm->code[size_of_code]);
+            //fprintf(stderr, "jump code = %lg\n", Asm->code[size_of_code]);
             Asm->code[size_of_code] = (Code_t)command;
-            fprintf(stderr, "jump code = %lg\n", Asm->code[size_of_code]);
+            //fprintf(stderr, "jump code = %lg\n", Asm->code[size_of_code]);
             size_of_code++;
 
             if(GetCommand(Asm, buffer, &been_read) != 0)
@@ -276,6 +274,22 @@ int  Convert_Code_To_Array(ASM_t* Asm)
 
             ArgPop(Asm, buffer, &size_of_code);
         }
+
+        else if(command == CALL)
+        {
+            //fprintf(stderr, "call code = %lg\n", Asm->code[size_of_code]);
+            Asm->code[size_of_code] = (Code_t)CALL;
+            //fprintf(stderr, "call code = %lg\n", Asm->code[size_of_code]);
+            size_of_code++;
+
+            if(GetCommand(Asm, buffer, &been_read) != 0)
+            {
+                return READING_ERROR;
+            }
+
+            ArgCall(Asm, buffer, &size_of_code);
+        }
+
         else if(command != 0)
         {
             Asm->code[size_of_code] = (Code_t)command;
@@ -292,83 +306,3 @@ int  Convert_Code_To_Array(ASM_t* Asm)
 
     return 0;
 }
-
-
-        //fprintf(Output_code, "%d", Asm->code[i]);
-//         switch(Asm->code[i])
-//         {
-//             case PUSH:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case JMP:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case JA:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case JAE:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case JB:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case JBE:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case JE:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case JNE:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case PUSHR:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//             case POP:
-//             {
-//                 i++;
-//                 fprintf(Output_code, " %d\n", Asm->code[i]);
-//                 break;
-//             }
-//
-//
-//
-//             default:
-//                 fprintf(Output_code, "\n");
-//         }

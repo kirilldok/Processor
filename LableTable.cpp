@@ -31,7 +31,7 @@ int LTDumpf(LabelTable* LT)
         return -1;
     }
 
-    fprintf(stderr, "sizeof(LT->labAr) / sizeof(label) = %zu\n", sizeof(LT->labAr) / sizeof(label));
+    //fprintf(stderr, "sizeof(LT->labAr) / sizeof(label) = %zu\n", sizeof(LT->labAr) / sizeof(label));
 
     for(size_t i = 0; i < LT->lnum; i++)
     {

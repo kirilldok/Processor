@@ -1,0 +1,177 @@
+push 3
+push -14
+push 6
+pop cx
+pop bx
+pop ax
+
+push 0
+push ax
+jne 101:
+call 202:
+111:
+
+hlt
+
+101:
+
+call 40:
+
+push 0
+push dx
+jb 404:
+4040:
+
+push 0
+push dx
+je 401:
+4010:
+
+push 0
+push dx
+ja 402:
+4020:
+
+jmp 111:
+
+404:
+call 1000:
+jmp 4040:
+
+401:
+call 1001:
+jmp 4010:
+
+402:
+call 1001:
+jmp 4020:
+
+
+
+1001:
+call 01:
+call 02:
+push 10
+push 50
+push 61
+push 78
+out
+out
+out
+out
+out
+out
+ret
+
+1000:
+push 10
+push 48
+push 61
+push 78
+out
+out
+out
+out
+ret
+
+1001:
+call 01:
+push 10
+push 49
+push 61
+push 78
+out
+out
+out
+out
+out
+ret
+
+01:
+push bx
+push dx
+sqrt
+add
+push 2
+push ax
+mul
+div
+ret
+
+02:
+push bx
+push dx
+sqrt
+sub
+push 2
+push ax
+mul
+div
+ret
+
+40:
+push bx
+push bx
+mul
+push 4
+push ax
+push cx
+mul
+mul
+sub
+pop dx
+ret
+
+202:
+push 0
+push bx
+jne 200:
+call 300:
+201:
+ret
+
+200:
+push 0
+push cx
+sub
+push bx
+div
+push 10
+push 49
+push 61
+push 78
+out
+out
+out
+out
+out
+jmp 201:
+
+300:
+push 0
+push cx
+jne 300:
+push 10
+push 70
+push 78
+push 73
+push 61
+push 78
+out
+out
+out
+out
+out
+301:
+ret
+
+300:
+push 10
+push 48
+push 61
+push 78
+out
+out
+out
+out
+jmp 301:

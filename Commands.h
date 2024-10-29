@@ -25,7 +25,9 @@ enum commands
     JNE   = 0x0018,
     JBE  = 0x0019,
     JAE  = 0x001A,
-    DUMP  = 0x001B,
+    CALL  = 0x001B,
+    RET   = 0x001C,
+    DUMP  = 0x001D,
 
     HLT   = 0x001F,
 };

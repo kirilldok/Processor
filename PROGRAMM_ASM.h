@@ -36,8 +36,8 @@ static const size_t default_max_code_size = 128;
 const char CommandNames[32][COMMANDNAME_MAX]
 {"", "push", "", "add", "sub", "div", "mul", "pow",
  "sqrt", "sin", "", "pop", "", "", "", "", "out", "",
- "", "", "jmp", "jb", "ja","je", "jne", "jbe", "jae", "dump", "",
- "", "", "hlt"};
+ "", "", "jmp", "jb", "ja","je", "jne", "jbe", "jae", "call", "ret",
+ "dump", "", "hlt"};
 
 
 
@@ -70,6 +70,7 @@ int CommandFind(char* buffer);
 
 int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code);
 int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code);
+int ArgCall(ASM_t* Asm, char* buffer, int* size_of_code);
 int ArgLabel(ASM_t* Asm, char* buffer, int size_of_code, char* lmarker);
 int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code);
 
