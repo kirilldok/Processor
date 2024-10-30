@@ -7,4 +7,6 @@ Objects
 *log.txt
 *compiler
 *reg_code.txt
-
+*SPU_Dump.txt
+*Machine_code.bin
+*LT_DUMP.txt

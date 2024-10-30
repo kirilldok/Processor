@@ -9,7 +9,7 @@
 #include<assert.h>
 #include<ctype.h>
 
-#include"StackFunc.h"
+#include<StackFunc.h>
 #include"LableTable.h"
 #include"Commands.h"
 

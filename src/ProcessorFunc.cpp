@@ -1,5 +1,5 @@
 #include "ProcessorFunc.h"
-#include "StackFunc.h"
+#include <StackFunc.h>
 
 static const size_t default_stack_size = 4;
 static const size_t default_max_code_size = 64;

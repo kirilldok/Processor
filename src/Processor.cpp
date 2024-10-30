@@ -2,7 +2,7 @@
 #include<stdbool.h>
 #include<string.h>
 
-#include"StackFunc.h"
+#include<StackFunc.h>
 #include"ProcessorFunc.h"
 #include"Commands.h"
 

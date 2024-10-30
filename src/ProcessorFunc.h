@@ -7,7 +7,7 @@
 #include<math.h>
 #include<assert.h>
 
-#include"StackFunc.h"
+#include<StackFunc.h>
 #include"Commands.h"
 
 enum ErrCodes
