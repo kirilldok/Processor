@@ -7,7 +7,7 @@
 #include<math.h>
 #include<assert.h>
 
-#include<StackFunc.h>
+#include"../MyStack/StackFunc.h"
 #include"Commands.h"
 
 enum ErrCodes
@@ -30,6 +30,8 @@ const uint32_t REG_MASK = 2;
 const uint32_t C_MASK = 1;
 static const size_t RAM_SIZE = 8;
 
+static const size_t default_max_code_size = 256;
+
 
 typedef struct SPU_t
 {
@@ -45,6 +47,7 @@ typedef struct SPU_t
 } SPU_t;
 
 int SpuCtor(SPU_t* spu);
+size_t CodeResize(SPU_t* spu, size_t oldcapacity);
 int SpuDtor(SPU_t* spu);
 int SPUDump(SPU_t* spu, const char* file, const char* func, int line);
 

@@ -2,7 +2,7 @@
 #include<stdbool.h>
 #include<string.h>
 
-#include<StackFunc.h>
+#include"../MyStack/StackFunc.h"
 #include"ProcessorFunc.h"
 #include"Commands.h"
 
@@ -52,6 +52,13 @@ int Read_Prog_File(FILE* Input_code, SPU_t* spu, Header* hdr)
 
     spu->code_size = hdr->size;
 
+    if (spu->code_size >= default_max_code_size)
+    {
+        //fprintf(stderr, "size = %lu\n", capacity);
+        CodeResize(spu, spu->code_size); assert(spu->code);
+    }
+
+    fprintf(stderr, " size = %lu\n", spu->code_size * sizeof(size_t));
     fread(spu->code, sizeof(Code_t), spu->code_size, Input_code);
     // fprintf(stderr, "wr = %lu\n", wr);
     // fprintf(stderr, "size = %lu\n", sizeof(spu->code));
@@ -119,11 +126,11 @@ void RunCode(SPU_t* spu)
         {
             case PUSH:
             {
-                (spu->ip)++;
+                ++spu->ip;
                 Code_t result = UniPush(spu);
                 StackPush(&spu->stk, result);
-                (spu->ip)++;
-                //SpuDump(spu);
+                ++spu->ip;
+                SpuDump(spu);
                 break;
             }
 
@@ -220,12 +227,24 @@ void RunCode(SPU_t* spu)
                 break;
             }
 
+            case IN:
+            {
+                Code_t arg = 0;
+                fscanf(stdin, "%lg", &arg);
+
+                StackPush(&spu->stk, arg);
+
+                ++spu->ip;
+                break;
+            }
+
             case POP:
             {
-                (spu->ip)++;
+                ++spu->ip;
                 Code_t* result = UniPop(spu);
                 StackPop(&spu->stk, result);
-                (spu->ip)++;
+                SpuDump(spu);
+                ++spu->ip;
                 break;
             }
 
@@ -288,7 +307,7 @@ void RunCode(SPU_t* spu)
                     spu->ip = (size_t)spu->code[spu->ip + 1];
                 else
                     spu->ip += 2;
-                SpuDump(spu);
+                //SpuDump(spu);
                 break;
             }
 
@@ -350,14 +369,15 @@ void RunCode(SPU_t* spu)
                 Code_t arg = 0;
                 StackPop(&spu->return_codes, &arg);
                 spu->ip = (size_t)arg;
+
                 break;
             }
 
             case DUMP:
             {
                 Stack_Dump(&spu->stk);
-
                 ++spu->ip;
+
                 break;
             }
 
@@ -373,7 +393,6 @@ void RunCode(SPU_t* spu)
             {
                 fprintf(stderr, "Sintax Error: '%.x; ip = %lu'\n", (unsigned)spu->code[spu->ip], spu->ip);
                 SpuDump(spu);
-                // fclose(Prog_code);
                 Loop_flag = 0;
             }
 

@@ -117,12 +117,11 @@ FILE* Command_file_open(int argc, const char** argv)
 int Write_in_file(FILE* Output_code, ASM_t* Asm)
 {
     assert(Output_code); assert(Asm);
-    // for(int i = 0; i < Asm->code_size; i++)
-    // {
-    //     //fscanf(Input_code, " %d", &spu->code[spu->ip]);
-    //     fprintf(stderr, " %lg\n", Asm->code[i]);
-    // }
-
+    for(int i = 0; i < Asm->code_size; i++)
+    {
+        //fscanf(Input_code, " %d", &spu->code[spu->ip]);
+        fprintf(stderr, " %lg\n", Asm->code[i]);
+    }
     uint32_t hdr[size_of_header] = {sign, ver, Asm->code_size, 0};
 
     fwrite(hdr, sizeof(hdr[0]), size_of_header, Output_code);
@@ -165,7 +164,7 @@ int GetCommand(ASM_t* Asm, char* buffer, size_t* been_read)
     if((commandptr = strchr(Asm->sheet.source + *been_read, ' ')) == NULL)
         return READING_ERROR;
 
-    if((commandptr - (Asm->sheet.source + *been_read))> COMMANDNAME_MAX)
+    if((commandptr - (Asm->sheet.source + *been_read)) > COMMANDNAME_MAX)
         return SYNTAX_ERROR;
 
     ssize_t sizebuf = commandptr - (Asm->sheet.source + *been_read);
@@ -181,7 +180,7 @@ int GetCommand(ASM_t* Asm, char* buffer, size_t* been_read)
 
 int CommandFind(char* buffer)
 {
-    for(int i = 1; i < COMMANDNAME_MAX; i++)
+    for(size_t i = 1; i < COMMANDNAME_MAX; i++)
     {
         if(strcmp(buffer, CommandNames[i]) == 0)
             return i;
@@ -190,14 +189,32 @@ int CommandFind(char* buffer)
     return 0;
 }
 
+size_t CodeResize(ASM_t* Asm, size_t oldcapacity)
+{
+    assert(Asm);
+    static const int ReallocCoef = 2;
+    size_t newcapacity = ReallocCoef * oldcapacity;
+
+    Asm->code = (Code_t*)realloc(Asm->code, newcapacity * sizeof(Code_t)); assert(Asm->code);
+
+    return newcapacity;
+}
+
 int  Convert_Code_To_Array(ASM_t* Asm)
 {
 
     int size_of_code = 0;
     size_t been_read = 0;
+    size_t capacity = default_max_code_size;
 
     while(been_read < Asm->sheet.size)
     {
+        if ((size_of_code + 4) >= capacity)
+        {
+            //fprintf(stderr, "size = %lu\n", capacity);
+            capacity = CodeResize(Asm, capacity); assert(Asm->code);
+        }
+
         char buffer[COMMANDNAME_MAX] = {};
 
         if(GetCommand(Asm, buffer, &been_read) != 0)
@@ -217,9 +234,6 @@ int  Convert_Code_To_Array(ASM_t* Asm)
             {
                 buffer[i] = '\0';
             }
-
-
-
             //fprintf(stderr, "buffer in loop =  %s\n", buffer);
 
             if(GetCommand(Asm, buffer, &been_read) != 0)

@@ -13,7 +13,7 @@ CPPFLAGS := -D _DEBUG
 CXXFLAGS := -ggdb3 -std=c++17 -O0 -fcheck-new -fsized-deallocation -fstack-protector -fstrict-overflow -flto-odr-type-merging -fno-omit-frame-pointer  -pie -fPIE $(WARNINGFLAGS) $(SANITIZEFLAGS)
 LDFLAGS := -pie -fPIE $(SANITIZEFLAGS)
 
-Objects/%.o : %.cpp
+Objects/%.o : src/%.cpp
 	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -I ./MyStack $< -c -o $@
 
 SOURCES := Objects/ProcessorFunc.o Objects/LableTable.o MyStack/stack.a

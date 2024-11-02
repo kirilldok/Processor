@@ -1,4 +1,4 @@
-push 5
+in
 pop ax
 call 127:
 push bx

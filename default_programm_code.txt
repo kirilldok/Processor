@@ -100,8 +100,8 @@ push bx
 mul
 push 4
 push ax
-push cx
 mul
+push cx
 mul
 sub
 pop dx

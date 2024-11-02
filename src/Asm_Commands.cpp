@@ -3,7 +3,7 @@
 
 int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
 {
-
+    fprintf(stderr, "## size push = %d\n", *(size_of_code));
     char* cptr = NULL; // pointer of begin [
     char* eptr = NULL; // pointer of end ]
     char* plusptr = NULL; // pointer of +
@@ -16,7 +16,7 @@ int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_REG_CONSTVAL;
             (*size_of_code)++;
 
-            //fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG_CONSTVAL);
+            fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG_CONSTVAL);
 
             if((reg = Register_convert(buffer + 1)) == -1) // buffer + (cptr - buffer)
             {
@@ -43,7 +43,7 @@ int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_REG;
             (*size_of_code)++;
 
-            //fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG);
+            fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG);
 
             Asm->code[*size_of_code] = (Code_t)reg;
             (*size_of_code)++;
@@ -84,19 +84,23 @@ int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
         Asm->code[*size_of_code] = (Code_t)REG;
         (*size_of_code)++;
 
-        //fprintf(stderr, "## ARGTYPER = %d\n", REG);
+        fprintf(stderr, "## ARGTYPER = %d\n", REG);
 
         Asm->code[*size_of_code] = (Code_t)reg;
         (*size_of_code)++;
     }
     else
     {
+        fprintf(stderr, "## size push = %d\n", *(size_of_code));
         Asm->code[*size_of_code] = (Code_t)CONSTVAL;
         (*size_of_code)++;
+        fprintf(stderr, "## size push = %d\n", *(size_of_code));
         Asm->code[*size_of_code] = (Code_t)atof(buffer);
         (*size_of_code)++;
-
-        //fprintf(stderr, "## ARGTYPE = %d\n", CONSTVAL);
+        fprintf(stderr, "## size push = %d\n", *(size_of_code));
+        fprintf(stderr, "## ARGTYPE = %d\n", CONSTVAL);
+        fprintf(stderr, "## BufPush = %s\n", buffer);
+        fprintf(stderr, "## BufPushdouble = %lg\n", Asm->code[*size_of_code - 1]);
     }
     return 0;
 }
@@ -227,7 +231,7 @@ int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_REG_CONSTVAL;
             (*size_of_code)++;
 
-            //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG_CONSTVAL));
+            fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG_CONSTVAL);
 
             if((reg = Register_convert(buffer + 1)) == -1) // buffer + (cptr - buffer)
             {
@@ -254,7 +258,7 @@ int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_REG;
             (*size_of_code)++;
 
-            //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG));
+            fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG);
 
             Asm->code[*size_of_code] = (Code_t)reg;
             (*size_of_code)++;
@@ -265,7 +269,7 @@ int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_CONSTVAL;
             (*size_of_code)++;
 
-            //ON_DEBUG(fprintf(stderr, "## ARGTYPE = %d\n", RAM_CONSTVAL));
+            fprintf(stderr, "## ARGTYPE = %d\n", RAM_CONSTVAL);
 
             Asm->code[*size_of_code] = (Code_t)atof(buffer + 1);
             (*size_of_code)++;
@@ -278,7 +282,7 @@ int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
         {
             return SYNTAX_ERROR;
         }
-
+        fprintf(stderr, "reg = %d\n", reg);
         Asm->code[*size_of_code] = (Code_t)REG;
         (*size_of_code)++;
         Asm->code[*size_of_code] = (Code_t)reg;

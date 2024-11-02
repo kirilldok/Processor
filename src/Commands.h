@@ -16,6 +16,7 @@ enum commands
     SQRT  = 0x0008,
     SIN   = 0x0009,
 
+    IN    = 0x000A,
     POP   = 0x000B,
     OUT   = 0x0010,
     JMP   = 0x0014,

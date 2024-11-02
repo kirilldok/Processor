@@ -9,7 +9,7 @@
 #include<assert.h>
 #include<ctype.h>
 
-#include<StackFunc.h>
+#include"../MyStack/StackFunc.h"
 #include"LableTable.h"
 #include"Commands.h"
 
@@ -35,7 +35,7 @@ static const size_t default_max_code_size = 128;
 
 const char CommandNames[32][COMMANDNAME_MAX]
 {"", "push", "", "add", "sub", "div", "mul", "pow",
- "sqrt", "sin", "", "pop", "", "", "", "", "out", "",
+ "sqrt", "sin", "in", "pop", "", "", "", "", "out", "",
  "", "", "jmp", "jb", "ja","je", "jne", "jbe", "jae", "call", "ret",
  "dump", "", "hlt"};
 
@@ -65,6 +65,7 @@ int32_t Register_convert(char* buffer);
 
 int Bufferize_file(FILE* CODE_ASM, ASM_t* Asm);
 long GetFileSize(FILE* file);
+size_t CodeResize(ASM_t* Asm, size_t oldcapacity);
 int GetCommand(ASM_t* Asm, char* buffer, size_t* been_read);
 int CommandFind(char* buffer);
 

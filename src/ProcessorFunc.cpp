@@ -1,9 +1,7 @@
 #include "ProcessorFunc.h"
-#include <StackFunc.h>
+#include"../MyStack/StackFunc.h"
 
 static const size_t default_stack_size = 4;
-static const size_t default_max_code_size = 64;
-
 
 int SpuCtor(SPU_t* spu)
 {
@@ -20,6 +18,17 @@ int SpuCtor(SPU_t* spu)
     return 0;
 }
 
+size_t CodeResize(SPU_t* spu, size_t oldcapacity)
+{
+    assert(spu);
+    static const int ReallocCoef = 2;
+    size_t newcapacity = ReallocCoef * oldcapacity;
+
+    spu->code = (Code_t*)realloc(spu->code, newcapacity * sizeof(Code_t)); assert(spu->code);
+
+    return newcapacity;
+}
+
 int SpuDtor(SPU_t* spu)
 {
     assert(spu);
@@ -34,7 +43,7 @@ int SpuDtor(SPU_t* spu)
 int SPUDump(SPU_t* spu, const char* file, const char* func, int line)
 {
     //fprintf(stderr, "Dump opened\n");
-    FILE* Dump = fopen("SPU_Dump.txt", "a+");
+    FILE* Dump = fopen("run/SPU_Dump.txt", "a+");
     assert(Dump);
 
     fprintf(Dump,

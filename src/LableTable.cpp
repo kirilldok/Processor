@@ -24,7 +24,7 @@ int LTDtor(label* LT)
 
 int LTDumpf(LabelTable* LT)
 {
-    FILE* fp =  fopen("LT_DUMP.txt", "w+b");
+    FILE* fp =  fopen("run/LT_DUMP.txt", "w+b"); assert(fp);
     if(fp == 0)
     {
         fprintf(stderr, "FIle reading error, can't dump\n");
