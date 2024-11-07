@@ -1,9 +1,10 @@
 #include "PROGRAMM_ASM.h"
 
 
-int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
+int ArgPush(ASM_t* Asm, char* buffer, size_t* size_of_code)
 {
-    fprintf(stderr, "## size push = %d\n", *(size_of_code));
+    // fprintf(stderr, "## size push = %d\n", *(size_of_code));
+    // fprintf(stderr, "code[size_of_code] = %lg\n", Asm->code[*size_of_code]);
     char* cptr = NULL; // pointer of begin [
     char* eptr = NULL; // pointer of end ]
     char* plusptr = NULL; // pointer of +
@@ -16,7 +17,7 @@ int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_REG_CONSTVAL;
             (*size_of_code)++;
 
-            fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG_CONSTVAL);
+            fprintf(stderr, "## ARGTYPE = %u\n", RAM_REG_CONSTVAL);
 
             if((reg = Register_convert(buffer + 1)) == -1) // buffer + (cptr - buffer)
             {
@@ -33,7 +34,6 @@ int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
                 return SYNTAX_ERROR;
             }
 
-
             Asm->code[*size_of_code] = (Code_t)atof(buffer + (eptr - plusptr + 1));
             (*size_of_code)++;
         }
@@ -43,7 +43,7 @@ int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_REG;
             (*size_of_code)++;
 
-            fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG);
+            fprintf(stderr, "## ARGTYPE = %u\n", RAM_REG);
 
             Asm->code[*size_of_code] = (Code_t)reg;
             (*size_of_code)++;
@@ -84,30 +84,30 @@ int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code)
         Asm->code[*size_of_code] = (Code_t)REG;
         (*size_of_code)++;
 
-        fprintf(stderr, "## ARGTYPER = %d\n", REG);
+        //fprintf(stderr, "## ARGTYPER = %d\n", REG);
 
         Asm->code[*size_of_code] = (Code_t)reg;
         (*size_of_code)++;
     }
     else
     {
-        fprintf(stderr, "## size push = %d\n", *(size_of_code));
+        //fprintf(stderr, "## size push = %d\n", *(size_of_code));
         Asm->code[*size_of_code] = (Code_t)CONSTVAL;
         (*size_of_code)++;
-        fprintf(stderr, "## size push = %d\n", *(size_of_code));
+        //fprintf(stderr, "## size push = %d\n", *(size_of_code));
         Asm->code[*size_of_code] = (Code_t)atof(buffer);
         (*size_of_code)++;
-        fprintf(stderr, "## size push = %d\n", *(size_of_code));
-        fprintf(stderr, "## ARGTYPE = %d\n", CONSTVAL);
-        fprintf(stderr, "## BufPush = %s\n", buffer);
-        fprintf(stderr, "## BufPushdouble = %lg\n", Asm->code[*size_of_code - 1]);
+        // fprintf(stderr, "## size push = %d\n", *(size_of_code));
+        // fprintf(stderr, "## ARGTYPE = %lg\n", (Code_t)CONSTVAL);
+        // fprintf(stderr, "## BufPush = %s\n", buffer);
+        // fprintf(stderr, "## BufPushdouble = %lg\n", Asm->code[*size_of_code - 1]);
     }
     return 0;
 }
 
 
 
-int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code)
+int ArgJump(ASM_t* Asm, char* buffer, size_t* size_of_code)
 {
     //fprintf(stderr, "## JMP ARG: %s\n", buffer);
     char* lmarker = NULL;
@@ -124,7 +124,7 @@ int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code)
 
     else
     {
-        uint32_t labVal = 0;
+        int32_t labVal = 0;
         *lmarker = '\0';
 
         if((labVal = FindLabel(&Asm->LTable, buffer)) == -1) // LABEL IS NOT IN THE TABLE YET
@@ -154,12 +154,12 @@ int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code)
 }
 
 
-int ArgCall(ASM_t* Asm, char* buffer, int* size_of_code)
+int ArgCall(ASM_t* Asm, char* buffer, size_t* size_of_code)
 {
     //fprintf(stderr, "## CALL ARG: %s\n", buffer);
     char* lmarker = NULL;
     lmarker = strchr(buffer, ':');
-    uint32_t labVal = 0;
+    int32_t labVal = 0;
     *lmarker = '\0';
 
     if((labVal = FindLabel(&Asm->LTable, buffer)) == -1) // LABEL IS NOT IN THE TABLE YET
@@ -188,14 +188,14 @@ int ArgCall(ASM_t* Asm, char* buffer, int* size_of_code)
 }
 
 
-int ArgLabel(ASM_t* Asm, char* buffer, int size_of_code, char* lmarker)
+int ArgLabel(ASM_t* Asm, char* buffer, size_t size_of_code, char* lmarker)
 {
         int labVal = 0;
         *lmarker = '\0';
         if((labVal = FindLabel(&Asm->LTable, buffer)) == -1)
         {
             strcpy(Asm->LTable.labAr[Asm->LTable.lnum].name, buffer);
-            Asm->LTable.labAr[Asm->LTable.lnum].ipTarg = size_of_code;
+            Asm->LTable.labAr[Asm->LTable.lnum].ipTarg = (double)size_of_code;
             //fprintf(stderr, "lable =  %lg\n", Asm->LTable.labAr[Asm->LTable.lnum].ipTarg);
             Asm->LTable.lnum++;
 
@@ -204,9 +204,9 @@ int ArgLabel(ASM_t* Asm, char* buffer, int size_of_code, char* lmarker)
             //fprintf(stderr, "## READ: %s\n", buffer);
         }
 
-        else if(Asm->LTable.labAr[labVal].ipTarg == -1)
+        else if((int32_t)Asm->LTable.labAr[labVal].ipTarg == -1)
         {
-            Asm->LTable.labAr[labVal].ipTarg = size_of_code;
+            Asm->LTable.labAr[labVal].ipTarg = (double)size_of_code;
 
             // fprintf(stderr, "## LABEL VALUE ADDED: %s = %lg\n", buffer,Asm->LTable.labAr[labVal].ipTarg);
             // LTDump(&Asm->LTable);
@@ -217,7 +217,7 @@ int ArgLabel(ASM_t* Asm, char* buffer, int size_of_code, char* lmarker)
 }
 
 
-int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
+int ArgPop(ASM_t* Asm, char* buffer, size_t* size_of_code)
 {
     char* cptr = NULL;
     char* eptr = NULL;
@@ -231,7 +231,7 @@ int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_REG_CONSTVAL;
             (*size_of_code)++;
 
-            fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG_CONSTVAL);
+            fprintf(stderr, "## ARGTYPE = %u\n", RAM_REG_CONSTVAL);
 
             if((reg = Register_convert(buffer + 1)) == -1) // buffer + (cptr - buffer)
             {
@@ -258,7 +258,7 @@ int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_REG;
             (*size_of_code)++;
 
-            fprintf(stderr, "## ARGTYPE = %d\n", RAM_REG);
+            fprintf(stderr, "## ARGTYPE = %u\n", RAM_REG);
 
             Asm->code[*size_of_code] = (Code_t)reg;
             (*size_of_code)++;
@@ -269,7 +269,7 @@ int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
             Asm->code[*size_of_code] = (Code_t)RAM_CONSTVAL;
             (*size_of_code)++;
 
-            fprintf(stderr, "## ARGTYPE = %d\n", RAM_CONSTVAL);
+            fprintf(stderr, "## ARGTYPE = %u\n", RAM_CONSTVAL);
 
             Asm->code[*size_of_code] = (Code_t)atof(buffer + 1);
             (*size_of_code)++;
@@ -282,7 +282,7 @@ int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code)
         {
             return SYNTAX_ERROR;
         }
-        fprintf(stderr, "reg = %d\n", reg);
+        //fprintf(stderr, "reg = %d\n", reg);
         Asm->code[*size_of_code] = (Code_t)REG;
         (*size_of_code)++;
         Asm->code[*size_of_code] = (Code_t)reg;

@@ -29,7 +29,7 @@ enum ErrCodes
 
 const uint32_t sign = 0x38EEE96B;
 const uint32_t ver = 2;
-const size_t COMMANDNAME_MAX = 32;
+const long COMMANDNAME_MAX = 32;
 const size_t ARGLEN_MAX = 64;
 static const size_t default_max_code_size = 128;
 
@@ -67,13 +67,13 @@ int Bufferize_file(FILE* CODE_ASM, ASM_t* Asm);
 long GetFileSize(FILE* file);
 size_t CodeResize(ASM_t* Asm, size_t oldcapacity);
 int GetCommand(ASM_t* Asm, char* buffer, size_t* been_read);
-int CommandFind(char* buffer);
+long CommandFind(char* buffer);
 
-int ArgPush(ASM_t* Asm, char* buffer, int* size_of_code);
-int ArgJump(ASM_t* Asm, char* buffer, int* size_of_code);
-int ArgCall(ASM_t* Asm, char* buffer, int* size_of_code);
-int ArgLabel(ASM_t* Asm, char* buffer, int size_of_code, char* lmarker);
-int ArgPop(ASM_t* Asm, char* buffer, int* size_of_code);
+int ArgPush(ASM_t* Asm, char* buffer, size_t* size_of_code);
+int ArgJump(ASM_t* Asm, char* buffer, size_t* size_of_code);
+int ArgCall(ASM_t* Asm, char* buffer, size_t* size_of_code);
+int ArgLabel(ASM_t* Asm, char* buffer, size_t size_of_code, char* lmarker);
+int ArgPop(ASM_t* Asm, char* buffer, size_t* size_of_code);
 
 int AsmCtor(ASM_t* Asm);
 int AsmDtor(ASM_t* Asm);

@@ -117,11 +117,11 @@ FILE* Command_file_open(int argc, const char** argv)
 int Write_in_file(FILE* Output_code, ASM_t* Asm)
 {
     assert(Output_code); assert(Asm);
-    for(int i = 0; i < Asm->code_size; i++)
-    {
-        //fscanf(Input_code, " %d", &spu->code[spu->ip]);
-        fprintf(stderr, " %lg\n", Asm->code[i]);
-    }
+    // for(int i = 0; i < Asm->code_size; i++)
+    // {
+    //     //fscanf(Input_code, " %d", &spu->code[spu->ip]);
+    //     fprintf(stderr, " %lg\n", Asm->code[i]);
+    // }
     uint32_t hdr[size_of_header] = {sign, ver, Asm->code_size, 0};
 
     fwrite(hdr, sizeof(hdr[0]), size_of_header, Output_code);
@@ -157,20 +157,39 @@ long GetFileSize(FILE* file)
     return size;
 }
 
+
 int GetCommand(ASM_t* Asm, char* buffer, size_t* been_read)
 {
     char* commandptr = NULL;
+    // char* ptr = NULL;
+    // ptr = strchr(Asm->sheet.source + *been_read, ';');
+    commandptr = strchr(Asm->sheet.source + *been_read, ' ');
 
-    if((commandptr = strchr(Asm->sheet.source + *been_read, ' ')) == NULL)
+    if((commandptr) == NULL)
         return READING_ERROR;
 
     if((commandptr - (Asm->sheet.source + *been_read)) > COMMANDNAME_MAX)
         return SYNTAX_ERROR;
 
+    char buffer1[COMMANDNAME_MAX] = {};
     ssize_t sizebuf = commandptr - (Asm->sheet.source + *been_read);
-    strncpy(buffer, Asm->sheet.source + *been_read, sizebuf);
-    buffer[sizebuf] = '\0';
+    strncpy(buffer1, Asm->sheet.source + *been_read, sizebuf);
 
+    char* ptr = NULL;
+    ptr = strchr(buffer1, ';');
+
+    if (ptr != nullptr)
+    {
+        ssize_t sizebufptr = ptr - buffer1;
+        strncpy(buffer, buffer1, sizebufptr);
+    }
+    else
+    {
+        strncpy(buffer, buffer1, sizebuf);
+        buffer[sizebuf] = '\0';
+    }
+
+    //fprintf(stderr, "ptr2 = %p\n", ptr);
     //fprintf(stderr, "buffer = %s\n", buffer);
     *been_read += commandptr - (Asm->sheet.source + *been_read) + 1; // +1 SO NEXT STRCHR DOESN'T INCLUDE LAST SEPARATION MARK
     //fprintf(stderr, " size of code = %zu\n", *been_read);
@@ -178,9 +197,9 @@ int GetCommand(ASM_t* Asm, char* buffer, size_t* been_read)
 }
 
 
-int CommandFind(char* buffer)
+long CommandFind(char* buffer)
 {
-    for(size_t i = 1; i < COMMANDNAME_MAX; i++)
+    for(long i = 1; i < COMMANDNAME_MAX; i++)
     {
         if(strcmp(buffer, CommandNames[i]) == 0)
             return i;
@@ -203,7 +222,7 @@ size_t CodeResize(ASM_t* Asm, size_t oldcapacity)
 int  Convert_Code_To_Array(ASM_t* Asm)
 {
 
-    int size_of_code = 0;
+    size_t size_of_code = 0;
     size_t been_read = 0;
     size_t capacity = default_max_code_size;
 
@@ -244,7 +263,7 @@ int  Convert_Code_To_Array(ASM_t* Asm)
         }
 
 
-        int command = CommandFind(buffer);
+        long command = CommandFind(buffer);
 
         if(command == PUSH)
         {
@@ -255,7 +274,7 @@ int  Convert_Code_To_Array(ASM_t* Asm)
             {
                 return READING_ERROR;
             }
-
+            //fprintf(stderr, "buffer push = %s\n", buffer);
             ArgPush(Asm, buffer, &size_of_code);
         }
 

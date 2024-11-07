@@ -63,7 +63,7 @@ int SPUDump(SPU_t* spu, const char* file, const char* func, int line)
         fprintf(Dump, "\n\t");
 
         for(size_t i = 0; i < spu->code_size; i++)
-            fprintf(Dump, "%.2x ", (unsigned)(spu->code[i]));
+            fprintf(Dump, "%.2x ", (int)(spu->code[i]));
         fprintf(Dump, "\n\t");
 
         for(size_t i = 0; i < spu->ip; i++)
